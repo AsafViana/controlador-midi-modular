@@ -17,6 +17,10 @@ bool OledApp::begin(uint8_t i2cAddress) {
         return false;
     }
 
+    // Posiciona o indicador MIDI no canto superior direito
+    // 6px de tamanho, com 2px de margem
+    _midiActivity = MidiActivityComponent(DISPLAY_WIDTH - 8, 1, 6);
+
     _display.clearDisplay();
     _display.display();
     return true;
@@ -37,6 +41,10 @@ Router& OledApp::getRouter() {
     return _router;
 }
 
+MidiActivityComponent& OledApp::getMidiActivity() {
+    return _midiActivity;
+}
+
 void OledApp::update() {
     uint32_t now = millis();
     if (now - _lastFrameTime < FRAME_INTERVAL_MS) {
@@ -53,13 +61,25 @@ void OledApp::update() {
         }
     }
 
-    // (c) Verificar dirty flag da Screen ativa e
-    // (d) se dirty: clearDisplay → render → display
+    // (c) Verificar se precisa redesenhar:
+    //     - Screen marcada como dirty, OU
+    //     - Indicador MIDI ativo (precisa atualizar o piscar)
     Screen* screen = _router.currentScreen();
-    if (screen != nullptr && screen->isDirty()) {
+    bool needsRedraw = (screen != nullptr && screen->isDirty());
+    bool midiActive = _midiActivity.isActive();
+
+    if (needsRedraw || midiActive) {
         _display.clearDisplay();
-        screen->render(_display);
+
+        // Renderiza a tela ativa
+        if (screen != nullptr) {
+            screen->render(_display);
+            screen->clearDirty();
+        }
+
+        // Renderiza o indicador MIDI como overlay (por cima de tudo)
+        _midiActivity.render(_display);
+
         _display.display();
-        screen->clearDirty();
     }
 }

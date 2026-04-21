@@ -2,82 +2,94 @@
 #include "config.h"
 #include "button/Button.h"
 #include "ui/OledApp.h"
-#include "ui/Screen.h"
-#include "ui/components/TextComponent.h"
+#include "storage/Storage.h"
+#include "hardware/HardwareMap.h"
+#include "hardware/ControlReader.h"
+#include "hardware/UnifiedControlList.h"
+#include "i2c/WireI2CBus.h"
+#include "i2c/I2CScanner.h"
+#include "screens/MenuScreen.h"
+#include "screens/PerformanceScreen.h"
+#include "screens/ConfigScreen.h"
+#include "screens/CCMapScreen.h"
+#include "screens/CanalScreen.h"
 
-// ── Pinos ────────────────────────────────────────────────
-#define BUTTON_PIN 8   // BOOT button do ESP32-S3 (ativo em LOW)
-#define LED_PIN    0   // LED interno (se disponível)
-
-// ── MIDI ─────────────────────────────────────────────────
+// ── Módulos ──────────────────────────────────────────────
 MidiEngine engine;
+Storage storage;
 
-MidiNote doMedio (MIDI_Notes::C(4));
-MidiNote miMedio (MIDI_Notes::E(4));
-MidiNote solMedio(MIDI_Notes::G(4));
+// ── I2C — Expansão modular ───────────────────────────────
+WireI2CBus i2cBus;
+I2CScanner scanner(&i2cBus);
+UnifiedControlList ucl(&scanner);
 
-// ── HomeScreen ───────────────────────────────────────────
-// Tela inicial que exibe o nome do instrumento e reage ao
-// botão BOOT para enviar notas MIDI.
-class HomeScreen : public Screen {
-public:
-    HomeScreen()
-        : _title(0, 10, USB_MIDI_DEVICE_NAME, 2)
-        , _subtitle(0, 40, "Pressione o botao!", 1)
-    {
-        addChild(&_title);
-        addChild(&_subtitle);
-    }
+// ── UI ───────────────────────────────────────────────────
+OledApp app;
+Button btnUp(HardwareMap::PIN_BTN_UP, true);
+Button btnDown(HardwareMap::PIN_BTN_DOWN, true);
+Button btnSelect(HardwareMap::PIN_BTN_SELECT, true);
 
-    void handleInput(ButtonEvent event) override {
-        if (event == ButtonEvent::PRESSED) {
-            engine.sendNoteOn(doMedio);
-            Serial.println(">>> BOTÃO PRESSIONADO! Sinal enviado. <<<");
-            digitalWrite(LED_PIN, HIGH);
-            _subtitle.setText("Nota ON");
-            markDirty();
-        } else if (event == ButtonEvent::RELEASED) {
-            engine.sendNoteOff(doMedio);
-            Serial.println("--- Botão solto.");
-            digitalWrite(LED_PIN, LOW);
-            _subtitle.setText("Pressione o botao!");
-            markDirty();
-        }
-    }
+// ── Leitura automática de controles analógicos ───────────
+ControlReader controlReader(&engine, &storage, &ucl, &scanner);
 
-private:
-    TextComponent _title;
-    TextComponent _subtitle;
-};
+// ── Telas ────────────────────────────────────────────────
+PerformanceScreen perfScreen(&engine, &storage);
+ConfigScreen configScreen(&app, &storage);
+CCMapScreen ccMapScreen(&storage, &ucl);
+CanalScreen canalScreen(&storage);
+MenuScreen menuScreen(&app);
 
-// ── Instâncias globais ───────────────────────────────────
-OledApp    app;
-Button     bootButton(BUTTON_PIN, true);  // pull-up, ativo em LOW
-HomeScreen homeScreen;
+// ── Callback de atividade MIDI ───────────────────────────
+void onMidiActivity() {
+    app.getMidiActivity().trigger();
+}
 
 // ── setup() ──────────────────────────────────────────────
 void setup() {
     Serial.begin(115200);
     engine.begin();
+    storage.begin();
 
-    pinMode(LED_PIN, OUTPUT);
+    // ── I2C: inicializar barramento, descobrir módulos, montar lista ──
+    i2cBus.begin();
+    scanner.scan();
+    ucl.rebuild();
 
-    // Inicializa o framework OLED
+    controlReader.begin();
+
+    pinMode(HardwareMap::PIN_LED, OUTPUT);
+
     if (!app.begin(DISPLAY_I2C_ADDRESS)) {
         Serial.println("Falha ao inicializar display OLED!");
     }
 
-    // Registra o botão BOOT no framework
-    bootButton.begin();
-    app.addButton(&bootButton);
+    engine.onActivity(onMidiActivity);
 
-    // Empilha a tela inicial no Router
-    app.getRouter().push(&homeScreen);
+    perfScreen.setApp(&app);
+    ccMapScreen.setApp(&app);
+    canalScreen.setApp(&app);
 
-    Serial.println("Sistema iniciado. Pressione o botão!");
+    btnUp.begin();
+    btnDown.begin();
+    btnSelect.begin();
+    app.addButton(&btnUp);
+    app.addButton(&btnDown);
+    app.addButton(&btnSelect);
+
+    app.getRouter().push(&menuScreen);
+
+    Serial.println("Sistema iniciado.");
 }
 
 // ── loop() ───────────────────────────────────────────────
 void loop() {
+    // Lê controles analógicos e envia CC automaticamente
+    controlReader.update();
+
+    // Varredura periódica I2C: detecta conexões/desconexões de módulos
+    scanner.periodicScan();
+    ucl.rebuild();
+
+    // Processa UI (botões, telas, display)
     app.update();
 }

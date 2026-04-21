@@ -19,6 +19,10 @@ namespace mock_midi {
         uint8_t channel;
         uint8_t velocity;
         bool    isNoteOn;
+        // CC fields
+        uint8_t controller;
+        uint8_t ccValue;
+        bool    isCC;
     };
 
     extern MidiMessage lastMessage;
@@ -30,12 +34,17 @@ namespace mock_midi {
 class USBMIDI_Interface {
 public:
     void sendNoteOn(MIDIAddress addr, uint8_t velocity) {
-        mock_midi::lastMessage = { addr.note, addr.channel, velocity, true };
+        mock_midi::lastMessage = { addr.note, addr.channel, velocity, true, 0, 0, false };
         mock_midi::messageCount++;
     }
 
     void sendNoteOff(MIDIAddress addr, uint8_t velocity) {
-        mock_midi::lastMessage = { addr.note, addr.channel, velocity, false };
+        mock_midi::lastMessage = { addr.note, addr.channel, velocity, false, 0, 0, false };
+        mock_midi::messageCount++;
+    }
+
+    void sendControlChange(MIDIAddress addr, uint8_t value) {
+        mock_midi::lastMessage = { 0, addr.channel, 0, false, addr.note, value, true };
         mock_midi::messageCount++;
     }
 };
