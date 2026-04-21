@@ -43,3 +43,11 @@ inline void delay(unsigned long ms) {
     mock::delayCalledMs = static_cast<int>(ms);
     mock::currentMillis += ms;
 }
+
+inline int analogRead(uint8_t pin) {
+    return mock::pinValues[pin];
+}
+
+inline void analogReadResolution(int bits) {
+    (void)bits; // No-op in mock
+}

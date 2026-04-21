@@ -36,15 +36,15 @@ Implementação incremental do sistema de expansão modular I2C, começando pela
     - requestFrom() retorna descritor ou valores conforme último comando
     - _Requisitos: 9.1, 9.3, 9.5_
 
-- [ ] 3. Testes PBT e unitários do ModuleDescriptor
-  - [ ]* 3.1 Criar `test/test_descriptor_pbt/test_descriptor_pbt.cpp` com PBT Property 3: Round-trip de serialização
+- [x] 3. Testes PBT e unitários do ModuleDescriptor
+  - [x] 3.1 Criar `test/test_descriptor_pbt/test_descriptor_pbt.cpp` com PBT Property 3: Round-trip de serialização
     - **Property 3: Round-trip de serialização do ModuleDescriptor**
     - Gerar ModuleDescriptor aleatório (numControles 1-16, tipos válidos, labels ASCII, valores 0-127)
     - Serializar → desserializar → comparar com original
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 3.2, 11.2, 11.4**
 
-  - [ ]* 3.2 Criar `test/test_descriptor_pbt/test_descriptor_pbt.cpp` com PBT Property 12: Desserialização rejeita dados inválidos
+  - [x] 3.2 Criar `test/test_descriptor_pbt/test_descriptor_pbt.cpp` com PBT Property 12: Desserialização rejeita dados inválidos
     - **Property 12: Desserialização rejeita dados inválidos**
     - Gerar buffers com numControles=0, numControles>16, tipos inválidos
     - Verificar que deserialize() retorna false
@@ -70,36 +70,36 @@ Implementação incremental do sistema de expansão modular I2C, começando pela
     - registerFailure(): incrementa failCount, remove módulo se >= 3
     - _Requisitos: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.3, 3.5, 10.2, 10.3, 10.4_
 
-- [ ] 6. Testes PBT e unitários do I2CScanner
-  - [ ]* 6.1 Criar `test/test_i2c_scanner_pbt/test_i2c_scanner_pbt.cpp` com PBT Property 2: Scanner registra módulos válidos
+- [x] 6. Testes PBT e unitários do I2CScanner
+  - [x] 6.1 Criar `test/test_i2c_scanner_pbt/test_i2c_scanner_pbt.cpp` com PBT Property 2: Scanner registra módulos válidos
     - **Property 2: Scanner registra módulos com descritores válidos**
     - Gerar 1-8 MockModules com descritores aleatórios válidos em endereços distintos
     - Após scan(), verificar que moduleCount e dados correspondem
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 2.3, 2.6**
 
-  - [ ]* 6.2 Adicionar PBT Property 4: Leitura de valores remotos preserva dados
+  - [x] 6.2 Adicionar PBT Property 4: Leitura de valores remotos preserva dados
     - **Property 4: Leitura de valores remotos preserva dados**
     - Configurar MockModule com N controles e valores aleatórios
     - readValues() deve retornar exatamente os mesmos valores
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 3.3**
 
-  - [ ]* 6.3 Adicionar PBT Property 5: Resiliência — últimos valores mantidos após falha
+  - [x] 6.3 Adicionar PBT Property 5: Resiliência — últimos valores mantidos após falha
     - **Property 5: Resiliência — últimos valores mantidos após falha**
     - Leitura bem-sucedida seguida de desconexão do mock
     - Verificar que últimos valores são preservados
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 3.5, 5.4, 10.1**
 
-  - [ ]* 6.4 Adicionar PBT Property 11: Desconexão após 3 falhas consecutivas
+  - [x] 6.4 Adicionar PBT Property 11: Desconexão após 3 falhas consecutivas
     - **Property 11: Desconexão após 3 falhas consecutivas**
     - Simular falhas consecutivas e verificar remoção no limiar exato de 3
     - Verificar que com 2 falhas o módulo permanece conectado
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 10.2**
 
-  - [ ]* 6.5 Criar `test/test_i2c_scanner/test_i2c_scanner.cpp` com testes unitários do scanner
+  - [x] 6.5 Criar `test/test_i2c_scanner/test_i2c_scanner.cpp` com testes unitários do scanner
     - test_scan_empty_bus: varredura sem módulos retorna 0
     - test_scan_skips_0x3C: endereço do OLED é ignorado
     - test_scan_timeout_skips_module: módulo que não responde ao descritor é ignorado
@@ -125,29 +125,29 @@ Implementação incremental do sistema de expansão modular I2C, começando pela
     - Para remotos: usar dados do ModuleDescriptor
     - _Requisitos: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
-- [ ] 9. Testes PBT e unitários da UnifiedControlList
-  - [ ]* 9.1 Criar `test/test_unified_list_pbt/test_unified_list_pbt.cpp` com PBT Property 1: Modo standalone preserva comportamento local
+- [x] 9. Testes PBT e unitários da UnifiedControlList
+  - [x] 9.1 Criar `test/test_unified_list_pbt/test_unified_list_pbt.cpp` com PBT Property 1: Modo standalone preserva comportamento local
     - **Property 1: Modo standalone preserva comportamento local**
     - Sem módulos externos, verificar que label, tipo e ccPadrao são idênticos ao HardwareMap
     - isRemoto() deve retornar false para todos os índices locais
     - Mínimo 100 iterações com LCG (variando índices)
     - **Valida: Requisitos 1.1, 1.4, 4.5**
 
-  - [ ]* 9.2 Adicionar PBT Property 6: Ordenação — locais primeiro, remotos depois
+  - [x] 9.2 Adicionar PBT Property 6: Ordenação — locais primeiro, remotos depois
     - **Property 6: Ordenação da lista unificada — locais primeiro, remotos depois**
     - Gerar configurações aleatórias de módulos, rebuild()
     - Verificar que índices 0..numLocais-1 são locais e numLocais.. são remotos
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 4.1**
 
-  - [ ]* 9.3 Adicionar PBT Property 7: Dados remotos correspondem ao descritor
+  - [x] 9.3 Adicionar PBT Property 7: Dados remotos correspondem ao descritor
     - **Property 7: Dados de controles remotos correspondem ao descritor**
     - Registrar MockModules, scan, rebuild
     - Verificar que label, tipo e ccPadrao de cada remoto correspondem ao descritor
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 4.3, 4.4, 4.6**
 
-  - [ ]* 9.4 Criar `test/test_unified_list/test_unified_list.cpp` com testes unitários
+  - [x] 9.4 Criar `test/test_unified_list/test_unified_list.cpp` com testes unitários
     - test_rebuild_no_modules: lista contém apenas locais sem módulos
     - test_rebuild_max_controls: lista respeita limite de 32 controles
     - test_rebuild_after_disconnect: lista atualizada após desconexão
@@ -170,8 +170,8 @@ Implementação incremental do sistema de expansão modular I2C, começando pela
     - Defaults: CC baseado no descritor, habilitado=true
     - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 12. Testes PBT do Storage remoto
-  - [ ]* 12.1 Criar `test/test_remote_storage_pbt/test_remote_storage_pbt.cpp` com PBT Property 9: Round-trip de persistência
+- [x] 12. Testes PBT do Storage remoto
+  - [x] 12.1 Criar `test/test_remote_storage_pbt/test_remote_storage_pbt.cpp` com PBT Property 9: Round-trip de persistência
     - **Property 9: Round-trip de persistência de configuração remota**
     - Gerar endereço (0x20-0x27), índice (0-15), CC (0-127), enabled (bool) aleatórios
     - setRemoteCC + setRemoteEnabled → getRemoteCC + isRemoteEnabled devem retornar os mesmos valores
@@ -192,8 +192,8 @@ Implementação incremental do sistema de expansão modular I2C, começando pela
     - Para controles locais: manter lógica existente (analogRead)
     - _Requisitos: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 14. Testes PBT do ControlReader remoto
-  - [ ]* 14.1 Criar `test/test_remote_reader_pbt/test_remote_reader_pbt.cpp` com PBT Property 8: Zona morta uniforme
+- [x] 14. Testes PBT do ControlReader remoto
+  - [x] 14.1 Criar `test/test_remote_reader_pbt/test_remote_reader_pbt.cpp` com PBT Property 8: Zona morta uniforme
     - **Property 8: Zona morta aplicada uniformemente a controles remotos**
     - Gerar pares de valores consecutivos (v1, v2) para controles remotos
     - Verificar que CC é enviado sse |v2-v1| > ZONA_MORTA
@@ -218,15 +218,15 @@ Implementação incremental do sistema de expansão modular I2C, começando pela
     - Sem módulos: exibir apenas locais (comportamento idêntico ao atual)
     - _Requisitos: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 17. Testes PBT e unitários da CCMapScreen remota
-  - [ ]* 17.1 Criar `test/test_ccmap_remote/test_ccmap_remote.cpp` com PBT Property 10: Prefixo de endereço no label
+- [x] 17. Testes PBT e unitários da CCMapScreen remota
+  - [x] 17.1 Criar `test/test_ccmap_remote/test_ccmap_remote.cpp` com PBT Property 10: Prefixo de endereço no label
     - **Property 10: Formatação de label remoto inclui prefixo de endereço**
     - Gerar controles remotos com endereços 0x20-0x27 e labels aleatórios
     - Verificar que o label formatado contém "[XX]" com endereço hex correto
     - Mínimo 100 iterações com LCG
     - **Valida: Requisitos 7.2**
 
-  - [ ]* 17.2 Adicionar testes unitários à `test/test_ccmap_remote/test_ccmap_remote.cpp`
+  - [x] 17.2 Adicionar testes unitários à `test/test_ccmap_remote/test_ccmap_remote.cpp`
     - test_ccmap_shows_remote_after_local: remotos aparecem após locais
     - test_ccmap_edit_remote_same_flow: fluxo de edição idêntico para remotos
     - test_ccmap_standalone_no_remote: sem módulos, apenas locais visíveis
