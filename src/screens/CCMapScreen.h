@@ -17,14 +17,13 @@ class UnifiedControlList;
  *   - Para remotos: prefixo "[XX]" com endereço I2C hex
  *
  * Navegação:
- *   - PRESSED:      Próximo controle
- *   - LONG_PRESS:   Controle anterior
- *   - SINGLE_CLICK: Entra no modo edição (cicla: CC → ON/OFF → sai)
- *   - DOUBLE_CLICK: Voltar
+ *   - SINGLE_CLICK: Próximo controle / incrementar valor
+ *   - LONG_PRESS:   Voltar (modo navegação) / decrementar valor (modo edição)
+ *   - DOUBLE_CLICK:  Confirmar / entrar no modo edição
  *
  * No modo edição:
- *   Fase 1 (CC): UP/DOWN muda CC, SELECT confirma e vai para fase 2
- *   Fase 2 (ON/OFF): UP/DOWN alterna, SELECT confirma e sai
+ *   Fase 1 (CC): SINGLE_CLICK incrementa, LONG_PRESS decrementa, DOUBLE_CLICK confirma
+ *   Fase 2 (ON/OFF): SINGLE_CLICK alterna, DOUBLE_CLICK confirma e sai
  *
  * Se UnifiedControlList for nullptr, comportamento idêntico ao original
  * (apenas controles locais do HardwareMap).

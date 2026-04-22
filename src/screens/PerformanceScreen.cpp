@@ -9,9 +9,9 @@ PerformanceScreen::PerformanceScreen(MidiEngine* engine, Storage* storage)
     , _storage(storage)
     , _app(nullptr)
     , _titulo(0, 0, "Performance", 2)
-    , _notaLabel(0, 25, "Nota: --", 1)
-    , _ccLabel(0, 38, "Mod: 0", 1)
-    , _barra(0, 52, 128, 10)
+    , _notaLabel(0, CONTENT_Y + 2, "Nota: --", 1)
+    , _ccLabel(0, CONTENT_Y + 15, "Mod: 0", 1)
+    , _barra(0, CONTENT_Y + CONTENT_HEIGHT - 12, OLED_WIDTH, 10)
 {
     addChild(&_titulo);
     addChild(&_notaLabel);
@@ -27,7 +27,7 @@ void PerformanceScreen::onMount() {
 }
 
 void PerformanceScreen::handleInput(ButtonEvent event) {
-    if (event == ButtonEvent::DOUBLE_CLICK) {
+    if (event == ButtonEvent::LONG_PRESS) {
         if (_app) _app->getRouter().pop();
         return;
     }

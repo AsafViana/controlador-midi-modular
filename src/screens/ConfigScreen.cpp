@@ -3,6 +3,7 @@
 #include "screens/CanalScreen.h"
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
+#include "config.h"
 
 extern CCMapScreen ccMapScreen;
 extern CanalScreen canalScreen;
@@ -17,14 +18,13 @@ ConfigScreen::ConfigScreen(OledApp* app, Storage* storage)
     : _app(app)
     , _storage(storage)
     , _titulo(0, 0, "Configuracoes", 1)
-    , _lista(0, 12, 128, 52, 1)
+    , _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT, 1)
 {
     addChild(&_titulo);
     addChild(&_lista);
 
     _lista.setItems(_configs, NUM_CONFIGS);
-    _lista.setDownButton(ButtonEvent::PRESSED);
-    _lista.setUpButton(ButtonEvent::LONG_PRESS);
+    _lista.setDownButton(ButtonEvent::SINGLE_CLICK);
 }
 
 void ConfigScreen::onMount() {
@@ -37,17 +37,20 @@ void ConfigScreen::onMount() {
 }
 
 void ConfigScreen::handleInput(ButtonEvent event) {
-    if (event == ButtonEvent::DOUBLE_CLICK) {
+    // LONG_PRESS = voltar
+    if (event == ButtonEvent::LONG_PRESS) {
         _app->getRouter().pop();
         return;
     }
 
+    // SINGLE_CLICK = navegar na lista (down)
     if (_lista.handleInput(event)) {
         markDirty();
         return;
     }
 
-    if (event == ButtonEvent::SINGLE_CLICK) {
+    // DOUBLE_CLICK = confirmar / entrar na opção selecionada
+    if (event == ButtonEvent::DOUBLE_CLICK) {
         Router& router = _app->getRouter();
         switch (_lista.getSelectedIndex()) {
             case 0:

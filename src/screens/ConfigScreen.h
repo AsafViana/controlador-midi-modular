@@ -11,9 +11,9 @@ class Storage;
  * Tela de configurações do teclado.
  *
  * Lista de parâmetros configuráveis. Navegação:
- *   - PRESSED:      Desce na lista
- *   - LONG_PRESS:   Sobe na lista
- *   - SINGLE_CLICK: Entra na sub-tela do item selecionado
+ *   - SINGLE_CLICK: Desce na lista
+ *   - DOUBLE_CLICK: Entra na sub-tela do item selecionado
+ *   - LONG_PRESS:   Voltar
  */
 class ConfigScreen : public Screen {
 public:

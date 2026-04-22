@@ -3,6 +3,7 @@
 #include "ui/OledApp.h"
 #include "hardware/UnifiedControlList.h"
 #include "Adafruit_SSD1306.h"
+#include "config.h"
 #include <cstdio>
 
 CCMapScreen::CCMapScreen(Storage* storage, UnifiedControlList* ucl)
@@ -102,19 +103,15 @@ void CCMapScreen::handleInput(ButtonEvent event) {
 
     if (_modo == ModoEdicao::NENHUM) {
         // ── Modo navegação ──────────────────────────────
-        if (event == ButtonEvent::DOUBLE_CLICK) {
+        if (event == ButtonEvent::LONG_PRESS) {
             if (_app) _app->getRouter().pop();
             return;
         }
-        if (event == ButtonEvent::PRESSED) {
+        if (event == ButtonEvent::SINGLE_CLICK) {
             if (_indice < total - 1) _indice++;
             markDirty();
         }
-        else if (event == ButtonEvent::LONG_PRESS) {
-            if (_indice > 0) _indice--;
-            markDirty();
-        }
-        else if (event == ButtonEvent::SINGLE_CLICK) {
+        else if (event == ButtonEvent::DOUBLE_CLICK) {
             _ccTemp = getCC(_indice);
             _modo = ModoEdicao::EDITAR_CC;
             markDirty();
@@ -122,7 +119,7 @@ void CCMapScreen::handleInput(ButtonEvent event) {
     }
     else if (_modo == ModoEdicao::EDITAR_CC) {
         // ── Editando CC ─────────────────────────────────
-        if (event == ButtonEvent::PRESSED) {
+        if (event == ButtonEvent::SINGLE_CLICK) {
             if (_ccTemp < 127) _ccTemp++;
             markDirty();
         }
@@ -130,7 +127,7 @@ void CCMapScreen::handleInput(ButtonEvent event) {
             if (_ccTemp > 0) _ccTemp--;
             markDirty();
         }
-        else if (event == ButtonEvent::SINGLE_CLICK) {
+        else if (event == ButtonEvent::DOUBLE_CLICK) {
             setCC(_indice, _ccTemp);
             _onOffTemp = isHabilitado(_indice);
             _modo = ModoEdicao::EDITAR_ONOFF;
@@ -139,11 +136,11 @@ void CCMapScreen::handleInput(ButtonEvent event) {
     }
     else if (_modo == ModoEdicao::EDITAR_ONOFF) {
         // ── Editando ON/OFF ─────────────────────────────
-        if (event == ButtonEvent::PRESSED || event == ButtonEvent::LONG_PRESS) {
+        if (event == ButtonEvent::SINGLE_CLICK || event == ButtonEvent::LONG_PRESS) {
             _onOffTemp = !_onOffTemp;
             markDirty();
         }
-        else if (event == ButtonEvent::SINGLE_CLICK) {
+        else if (event == ButtonEvent::DOUBLE_CLICK) {
             setHabilitado(_indice, _onOffTemp);
             _modo = ModoEdicao::NENHUM;
             markDirty();
@@ -163,26 +160,26 @@ void CCMapScreen::render(Adafruit_SSD1306& display) {
     char labelBuf[24];
 
     if (_modo == ModoEdicao::EDITAR_CC) {
-        display.setCursor(0, 14);
+        display.setCursor(0, CONTENT_Y);
         display.print("Editando CC:");
 
         display.setTextSize(2);
-        display.setCursor(0, 26);
+        display.setCursor(0, CONTENT_Y + 12);
         display.print(formatLabel(_indice, labelBuf, sizeof(labelBuf)));
 
         snprintf(_lineBuf[0], sizeof(_lineBuf[0]), "CC: %d", _ccTemp);
-        display.setCursor(0, 46);
+        display.setCursor(0, CONTENT_Y + 32);
         display.print(_lineBuf[0]);
 
     } else if (_modo == ModoEdicao::EDITAR_ONOFF) {
-        display.setCursor(0, 14);
+        display.setCursor(0, CONTENT_Y);
         display.print("Habilitar controle:");
 
         display.setTextSize(2);
-        display.setCursor(0, 26);
+        display.setCursor(0, CONTENT_Y + 12);
         display.print(formatLabel(_indice, labelBuf, sizeof(labelBuf)));
 
-        display.setCursor(0, 46);
+        display.setCursor(0, CONTENT_Y + 32);
         display.print(_onOffTemp ? "[ ON  ]" : "[ OFF ]");
 
     } else {
@@ -191,7 +188,7 @@ void CCMapScreen::render(Adafruit_SSD1306& display) {
         if (_indice >= 4) startIdx = _indice - 3;
 
         uint8_t itemH = 10;
-        uint8_t y0 = 14;
+        uint8_t y0 = CONTENT_Y;
 
         for (uint8_t i = 0; i < 4 && (startIdx + i) < total; i++) {
             uint8_t idx = startIdx + i;

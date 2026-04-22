@@ -10,10 +10,9 @@ class OledApp;
  * Tela de seleção do canal MIDI (1-16).
  *
  * Navegação:
- *   - PRESSED:      Incrementa canal
- *   - LONG_PRESS:   Decrementa canal
- *   - SINGLE_CLICK: Confirma e salva
- *   - DOUBLE_CLICK: Voltar
+ *   - SINGLE_CLICK: Incrementa canal
+ *   - DOUBLE_CLICK: Confirma e salva
+ *   - LONG_PRESS:   Voltar
  */
 class CanalScreen : public Screen {
 public:

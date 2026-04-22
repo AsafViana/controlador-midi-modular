@@ -12,3 +12,8 @@
 #define DISPLAY_I2C_ADDRESS 0x3C
 #define DISPLAY_WIDTH       128
 #define DISPLAY_HEIGHT      64
+#define OLED_WIDTH          128
+#define OLED_HEIGHT         64
+#define HEADER_HEIGHT       16
+#define CONTENT_Y           HEADER_HEIGHT
+#define CONTENT_HEIGHT      (OLED_HEIGHT - HEADER_HEIGHT)

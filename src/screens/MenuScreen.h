@@ -10,7 +10,7 @@ class OledApp;
  * Tela de menu principal do teclado.
  *
  * Exibe uma lista de opções navegável. Clique simples desce,
- * long press sobe, double click entra na opção selecionada.
+ * long press sobe, double click confirma a opção selecionada.
  */
 class MenuScreen : public Screen {
 public:
