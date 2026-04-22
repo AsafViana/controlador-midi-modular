@@ -8,6 +8,10 @@
 #define MIDI_DEFAULT_CHANNEL  1
 #define MIDI_DEFAULT_CC_VALUE  0
 
+// MIDI DIN (serial 5-pin) — não usado no build native, mas definido para compilar
+#define MIDI_DIN_BAUD         31250
+#define MIDI_DIN_TX_PIN       17
+
 // Display OLED SSD1306
 #define DISPLAY_I2C_ADDRESS 0x3C
 #define DISPLAY_WIDTH       128

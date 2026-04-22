@@ -27,6 +27,9 @@ namespace HardwareMap {
     constexpr uint8_t PIN_I2C_SDA    = 5;   // fio SDA da tela
     constexpr uint8_t PIN_I2C_SCL    = 4;   // fio SCL da tela
 
+    // ── MIDI DIN (serial 5-pin) ─────────────────────────
+    constexpr uint8_t PIN_MIDI_DIN_TX = 17;  // TX para conector DIN 5 pinos
+
     // ── Botões de navegação (não são controles MIDI) ─────
     constexpr uint8_t PIN_BTN_UP     = 11;
     constexpr uint8_t PIN_BTN_DOWN   = 12;
