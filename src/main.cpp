@@ -25,9 +25,9 @@ UnifiedControlList ucl(&scanner);
 
 // ── UI ───────────────────────────────────────────────────
 OledApp app;
-Button btnUp(HardwareMap::PIN_BTN_UP, true);
-Button btnDown(HardwareMap::PIN_BTN_DOWN, true);
-Button btnSelect(HardwareMap::PIN_BTN_SELECT, true);
+App::Button btnUp(HardwareMap::PIN_BTN_UP, true);
+App::Button btnDown(HardwareMap::PIN_BTN_DOWN, true);
+App::Button btnSelect(HardwareMap::PIN_BTN_SELECT, true);
 
 // ── Leitura automática de controles analógicos ───────────
 ControlReader controlReader(&engine, &storage, &ucl, &scanner);
@@ -83,13 +83,8 @@ void setup() {
 
 // ── loop() ───────────────────────────────────────────────
 void loop() {
-    // Lê controles analógicos e envia CC automaticamente
     controlReader.update();
-
-    // Varredura periódica I2C: detecta conexões/desconexões de módulos
     scanner.periodicScan();
     ucl.rebuild();
-
-    // Processa UI (botões, telas, display)
     app.update();
 }

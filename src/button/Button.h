@@ -11,37 +11,38 @@ enum class ButtonEvent {
   DOUBLE_CLICK   // dois cliques rápidos
 };
 
+namespace App {
+
 class Button {
 public:
-  // Configurações ajustáveis
-  static constexpr uint16_t DEBOUNCE_MS    = 50;
-  static constexpr uint16_t LONG_PRESS_MS  = 800;
+  static constexpr uint16_t DEBOUNCE_MS     = 50;
+  static constexpr uint16_t LONG_PRESS_MS   = 800;
   static constexpr uint16_t DOUBLE_CLICK_MS = 300;
 
-  // pin        : GPIO do botão
-  // activeLow  : true se usa INPUT_PULLUP (botão liga ao GND)
   Button(uint8_t pin, bool activeLow = true);
 
-  void begin();              // chama no setup()
-  ButtonEvent update();      // chama no loop() — retorna o evento atual
+  void begin();
+  ButtonEvent update();
 
-  bool isHeld() const;       // true enquanto botão está pressionado
-  uint32_t heldDuration() const; // ms desde o último press
+  bool isHeld() const;
+  uint32_t heldDuration() const;
 
 private:
   uint8_t  _pin;
   bool     _activeLow;
 
-  bool     _lastRaw       = false;
-  bool     _state         = false;  // estado estável após debounce
-  bool     _held          = false;
+  bool     _lastRaw      = false;
+  bool     _state        = false;
+  bool     _held         = false;
 
-  uint32_t _lastDebounce  = 0;
-  uint32_t _pressTime     = 0;
-  uint32_t _releaseTime   = 0;
+  uint32_t _lastDebounce = 0;
+  uint32_t _pressTime    = 0;
+  uint32_t _releaseTime  = 0;
 
-  bool     _longFired     = false;
-  uint8_t  _clickCount    = 0;
+  bool     _longFired    = false;
+  uint8_t  _clickCount   = 0;
 
   bool rawRead() const;
 };
+
+} // namespace App
