@@ -4,7 +4,6 @@
 #include "ui/OledApp.h"
 #include "config.h"
 
-// Declarações externas das telas (definidas em main.cpp)
 extern PerformanceScreen perfScreen;
 extern ConfigScreen configScreen;
 
@@ -21,37 +20,33 @@ MenuScreen::MenuScreen(OledApp* app)
 {
     addChild(&_titulo);
     addChild(&_lista);
-
     _lista.setItems(_opcoes, NUM_OPCOES);
-    // SINGLE_CLICK = down, LONG_PRESS = up, DOUBLE_CLICK = select
-    _lista.setDownButton(ButtonEvent::SINGLE_CLICK);
-    _lista.setUpButton(ButtonEvent::LONG_PRESS);
 }
 
-void MenuScreen::onMount() {
-    markDirty();
-}
+void MenuScreen::onMount() { markDirty(); }
 
-void MenuScreen::handleInput(ButtonEvent event) {
-    // Navegação na lista
-    if (_lista.handleInput(event)) {
-        markDirty();
-        return;
-    }
+void MenuScreen::handleInput(NavInput input) {
+    Router& router = _app->getRouter();
 
-    // DOUBLE_CLICK = entrar na opção selecionada
-    if (event == ButtonEvent::DOUBLE_CLICK) {
-        Router& router = _app->getRouter();
-        switch (_lista.getSelectedIndex()) {
-            case 0:
-                router.push(&perfScreen);
-                break;
-            case 1:
-                router.push(&configScreen);
-                break;
-            case 2:
-                // Sobre — futuro
-                break;
-        }
+    switch (input) {
+        case NavInput::UP:
+            _lista.selectPrev();
+            markDirty();
+            break;
+
+        case NavInput::DOWN:
+            _lista.selectNext();
+            markDirty();
+            break;
+
+        case NavInput::SELECT:
+            switch (_lista.getSelectedIndex()) {
+                case 0: router.push(&perfScreen);   break;
+                case 1: router.push(&configScreen); break;
+                case 2: /* Sobre — futuro */         break;
+            }
+            break;
+
+        default: break;
     }
 }

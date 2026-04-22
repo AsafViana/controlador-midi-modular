@@ -27,19 +27,20 @@ bool OledApp::begin(uint8_t i2cAddress) {
     return true;
 }
 
-void OledApp::addButton(App::Button* button) {
-    if (button == nullptr) return;
-    if (_buttonCount >= MAX_BUTTONS) return;
-    _buttons[_buttonCount] = button;
-    _buttonCount++;
-}
+void OledApp::setButtonUp(App::Button* btn)     { _btnUp     = btn; }
+void OledApp::setButtonDown(App::Button* btn)   { _btnDown   = btn; }
+void OledApp::setButtonSelect(App::Button* btn) { _btnSelect = btn; }
 
-Router& OledApp::getRouter() {
-    return _router;
-}
+Router& OledApp::getRouter()                         { return _router; }
+MidiActivityComponent& OledApp::getMidiActivity()    { return _midiActivity; }
 
-MidiActivityComponent& OledApp::getMidiActivity() {
-    return _midiActivity;
+void OledApp::_pollButton(App::Button* btn, NavInput role) {
+    if (btn == nullptr) return;
+    ButtonEvent ev = btn->update();
+    // Dispara apenas no SINGLE_CLICK (borda de pressão limpa)
+    if (ev == ButtonEvent::SINGLE_CLICK) {
+        _router.handleInput(role);
+    }
 }
 
 void OledApp::update() {
@@ -47,14 +48,11 @@ void OledApp::update() {
     if (now - _lastFrameTime < FRAME_INTERVAL_MS) return;
     _lastFrameTime = now;
 
-    for (uint8_t i = 0; i < _buttonCount; i++) {
-        ButtonEvent event = _buttons[i]->update();
-        if (event != ButtonEvent::NONE) {
-            _router.handleInput(event);
-        }
-    }
+    _pollButton(_btnUp,     NavInput::UP);
+    _pollButton(_btnDown,   NavInput::DOWN);
+    _pollButton(_btnSelect, NavInput::SELECT);
 
-    Screen* screen = _router.currentScreen();
+    Screen* screen   = _router.currentScreen();
     bool needsRedraw = (screen != nullptr && screen->isDirty());
     bool midiActive  = _midiActivity.isActive();
 

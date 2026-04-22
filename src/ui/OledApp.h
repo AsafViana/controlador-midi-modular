@@ -3,21 +3,22 @@
 #include <stdint.h>
 #include "Adafruit_SSD1306.h"
 #include "ui/Router.h"
+#include "ui/NavInput.h"
 #include "ui/components/MidiActivityComponent.h"
 
-// Forward declaration com namespace correto
 namespace App { class Button; }
 
-/**
- * OledApp — fachada principal do framework de UI OLED.
- */
 class OledApp {
 public:
     OledApp() : _midiActivity(112, 0, 6) {}
 
     bool begin(uint8_t i2cAddress = 0x3C);
     void update();
-    void addButton(App::Button* button);
+
+    void setButtonUp(App::Button* btn);
+    void setButtonDown(App::Button* btn);
+    void setButtonSelect(App::Button* btn);
+
     Router& getRouter();
     MidiActivityComponent& getMidiActivity();
 
@@ -26,10 +27,12 @@ private:
     Router _router;
     MidiActivityComponent _midiActivity;
 
-    static constexpr uint8_t MAX_BUTTONS = 4;
-    App::Button* _buttons[MAX_BUTTONS] = {};
-    uint8_t _buttonCount = 0;
+    App::Button* _btnUp     = nullptr;
+    App::Button* _btnDown   = nullptr;
+    App::Button* _btnSelect = nullptr;
 
     uint32_t _lastFrameTime = 0;
     static constexpr uint32_t FRAME_INTERVAL_MS = 33;
+
+    void _pollButton(App::Button* btn, NavInput role);
 };

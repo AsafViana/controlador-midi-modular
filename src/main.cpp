@@ -44,17 +44,14 @@ void onMidiActivity() {
     app.getMidiActivity().trigger();
 }
 
-// ── setup() ──────────────────────────────────────────────
 void setup() {
     Serial.begin(115200);
     engine.begin();
     storage.begin();
 
-    // ── I2C: inicializar barramento, descobrir módulos, montar lista ──
     i2cBus.begin();
     scanner.scan();
     ucl.rebuild();
-
     controlReader.begin();
 
     pinMode(HardwareMap::PIN_LED, OUTPUT);
@@ -69,19 +66,19 @@ void setup() {
     ccMapScreen.setApp(&app);
     canalScreen.setApp(&app);
 
+    // Cada botão com papel fixo
     btnUp.begin();
     btnDown.begin();
     btnSelect.begin();
-    app.addButton(&btnUp);
-    app.addButton(&btnDown);
-    app.addButton(&btnSelect);
+    app.setButtonUp(&btnUp);
+    app.setButtonDown(&btnDown);
+    app.setButtonSelect(&btnSelect);
 
     app.getRouter().push(&menuScreen);
 
     Serial.println("Sistema iniciado.");
 }
 
-// ── loop() ───────────────────────────────────────────────
 void loop() {
     controlReader.update();
     scanner.periodicScan();

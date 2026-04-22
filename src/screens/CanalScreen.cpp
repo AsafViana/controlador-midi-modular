@@ -1,63 +1,43 @@
 #include "screens/CanalScreen.h"
-#include "storage/Storage.h"
 #include "ui/OledApp.h"
-#include "Adafruit_SSD1306.h"
 #include "config.h"
-#include <cstdio>
 
 CanalScreen::CanalScreen(Storage* storage)
     : _storage(storage)
-    , _app(nullptr)
     , _titulo(0, 0, "Canal MIDI", 1)
+    , _valorComp(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT)
 {
     addChild(&_titulo);
+    addChild(&_valorComp);
 }
 
 void CanalScreen::onMount() {
-    _canal = _storage->getCanalMidi();
-    _confirmado = false;
+    _canal = _storage->getMidiChannel();
+    _valorComp.setValue(_canal);
     markDirty();
 }
 
-void CanalScreen::handleInput(ButtonEvent event) {
-    // LONG_PRESS = voltar
-    if (event == ButtonEvent::LONG_PRESS) {
-        if (_app) _app->getRouter().pop();
-        return;
-    }
+void CanalScreen::handleInput(NavInput input) {
+    switch (input) {
+        case NavInput::UP:
+            if (_canal < 16) { _canal++; _valorComp.setValue(_canal); markDirty(); }
+            break;
 
-    if (event == ButtonEvent::SINGLE_CLICK) {
-        if (_canal < 16) {
-            _canal++;
-            _confirmado = false;
-            markDirty();
-        }
-    }
-    else if (event == ButtonEvent::DOUBLE_CLICK) {
-        _storage->setCanalMidi(_canal);
-        _confirmado = true;
-        markDirty();
+        case NavInput::DOWN:
+            if (_canal > 1)  { _canal--; _valorComp.setValue(_canal); markDirty(); }
+            break;
+
+        case NavInput::SELECT:
+            _storage->setMidiChannel(_canal);
+            if (_app) _app->getRouter().pop();
+            break;
+
+        default: break;
     }
 }
 
+void CanalScreen::setApp(OledApp* app) { _app = app; }
+
 void CanalScreen::render(Adafruit_SSD1306& display) {
-    Screen::render(display);
-
-    snprintf(_canalBuf, sizeof(_canalBuf), "%d", _canal);
-
-    display.setTextSize(3);
-    display.setTextColor(SSD1306_WHITE);
-
-    int16_t x = (_canal >= 10) ? 44 : 56;
-    display.setCursor(x, CONTENT_Y + 6);
-    display.print(_canalBuf);
-
-    display.setTextSize(1);
-    if (_confirmado) {
-        display.setCursor(30, CONTENT_Y + CONTENT_HEIGHT - 10);
-        display.print("Salvo!");
-    } else {
-        display.setCursor(4, CONTENT_Y + CONTENT_HEIGHT - 10);
-        display.print("CLK:+1 DCLK:salvar");
-    }
+    renderChildren(display);
 }
