@@ -34,11 +34,11 @@ void MenuScreen::handleInput(NavInput input) {
 
     switch (input) {
         case NavInput::UP:
-            _lista.selectPrev();
+            _lista.handleInput(ButtonEvent::LONG_PRESS);
             markDirty();
             break;
         case NavInput::DOWN:
-            _lista.selectNext();
+            _lista.handleInput(ButtonEvent::SINGLE_CLICK);
             markDirty();
             break;
         case NavInput::SELECT:

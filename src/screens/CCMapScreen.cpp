@@ -15,8 +15,6 @@ CCMapScreen::CCMapScreen(Storage* storage, UnifiedControlList* ucl)
     addChild(&_titulo);
 }
 
-// ── Helpers privados ────────────────────────────────────
-
 uint8_t CCMapScreen::getTotalControles() const {
     if (_ucl) return _ucl->getNumControles();
     return HardwareMap::NUM_CONTROLES;
@@ -32,6 +30,8 @@ bool CCMapScreen::isRemoto(uint8_t idx) const {
     return false;
 }
 
+void CCMapScreen::setApp(OledApp* app) { _app = app; }
+
 const char* CCMapScreen::getBaseLabel(uint8_t idx) const {
     if (_ucl) return _ucl->getLabel(idx);
     return HardwareMap::getLabel(idx);
@@ -44,9 +44,7 @@ const char* CCMapScreen::formatLabel(uint8_t idx, char* buf, uint8_t bufSize) co
         snprintf(buf, bufSize, "[%02X]%s", addr, getBaseLabel(idx));
         return buf;
     }
-    // Para locais, retorna o label diretamente (sem cópia desnecessária)
-    const char* label = getBaseLabel(idx);
-    snprintf(buf, bufSize, "%s", label);
+    snprintf(buf, bufSize, "%s", getBaseLabel(idx));
     return buf;
 }
 
@@ -88,70 +86,67 @@ void CCMapScreen::setHabilitado(uint8_t idx, bool habilitado) {
     _storage->setControleHabilitado(idx, habilitado);
 }
 
-// ── Ciclo de vida ───────────────────────────────────────
-
 void CCMapScreen::onMount() {
     _indice = 0;
     _modo = ModoEdicao::NENHUM;
     markDirty();
 }
 
-// ── Input ───────────────────────────────────────────────
-
-void CCMapScreen::handleInput(ButtonEvent event) {
+void CCMapScreen::handleInput(NavInput input) {
     const uint8_t total = getTotalControles();
 
     if (_modo == ModoEdicao::NENHUM) {
-        // ── Modo navegação ──────────────────────────────
-        if (event == ButtonEvent::LONG_PRESS) {
-            if (_app) _app->getRouter().pop();
-            return;
-        }
-        if (event == ButtonEvent::SINGLE_CLICK) {
-            if (_indice < total - 1) _indice++;
-            markDirty();
-        }
-        else if (event == ButtonEvent::DOUBLE_CLICK) {
-            _ccTemp = getCC(_indice);
-            _modo = ModoEdicao::EDITAR_CC;
-            markDirty();
+        switch (input) {
+            case NavInput::UP:
+                if (_indice > 0) { _indice--; markDirty(); }
+                break;
+            case NavInput::DOWN:
+                if (_indice < total - 1) { _indice++; markDirty(); }
+                break;
+            case NavInput::SELECT:
+                _ccTemp = getCC(_indice);
+                _modo = ModoEdicao::EDITAR_CC;
+                markDirty();
+                break;
+            default: break;
         }
     }
     else if (_modo == ModoEdicao::EDITAR_CC) {
-        // ── Editando CC ─────────────────────────────────
-        if (event == ButtonEvent::SINGLE_CLICK) {
-            if (_ccTemp < 127) _ccTemp++;
-            markDirty();
-        }
-        else if (event == ButtonEvent::LONG_PRESS) {
-            if (_ccTemp > 0) _ccTemp--;
-            markDirty();
-        }
-        else if (event == ButtonEvent::DOUBLE_CLICK) {
-            setCC(_indice, _ccTemp);
-            _onOffTemp = isHabilitado(_indice);
-            _modo = ModoEdicao::EDITAR_ONOFF;
-            markDirty();
+        switch (input) {
+            case NavInput::UP:
+                if (_ccTemp < 127) { _ccTemp++; markDirty(); }
+                break;
+            case NavInput::DOWN:
+                if (_ccTemp > 0)   { _ccTemp--; markDirty(); }
+                break;
+            case NavInput::SELECT:
+                setCC(_indice, _ccTemp);
+                _onOffTemp = isHabilitado(_indice);
+                _modo = ModoEdicao::EDITAR_ONOFF;
+                markDirty();
+                break;
+            default: break;
         }
     }
     else if (_modo == ModoEdicao::EDITAR_ONOFF) {
-        // ── Editando ON/OFF ─────────────────────────────
-        if (event == ButtonEvent::SINGLE_CLICK || event == ButtonEvent::LONG_PRESS) {
-            _onOffTemp = !_onOffTemp;
-            markDirty();
-        }
-        else if (event == ButtonEvent::DOUBLE_CLICK) {
-            setHabilitado(_indice, _onOffTemp);
-            _modo = ModoEdicao::NENHUM;
-            markDirty();
+        switch (input) {
+            case NavInput::UP:
+            case NavInput::DOWN:
+                _onOffTemp = !_onOffTemp;
+                markDirty();
+                break;
+            case NavInput::SELECT:
+                setHabilitado(_indice, _onOffTemp);
+                _modo = ModoEdicao::NENHUM;
+                markDirty();
+                break;
+            default: break;
         }
     }
 }
 
-// ── Render ──────────────────────────────────────────────
-
 void CCMapScreen::render(Adafruit_SSD1306& display) {
-    Screen::render(display);
+    renderChildren(display);
 
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
@@ -162,52 +157,48 @@ void CCMapScreen::render(Adafruit_SSD1306& display) {
     if (_modo == ModoEdicao::EDITAR_CC) {
         display.setCursor(0, CONTENT_Y);
         display.print("Editando CC:");
-
         display.setTextSize(2);
         display.setCursor(0, CONTENT_Y + 12);
         display.print(formatLabel(_indice, labelBuf, sizeof(labelBuf)));
-
         snprintf(_lineBuf[0], sizeof(_lineBuf[0]), "CC: %d", _ccTemp);
+        display.setTextSize(1);
         display.setCursor(0, CONTENT_Y + 32);
         display.print(_lineBuf[0]);
 
     } else if (_modo == ModoEdicao::EDITAR_ONOFF) {
         display.setCursor(0, CONTENT_Y);
-        display.print("Habilitar controle:");
-
+        display.print("Habilitar:");
         display.setTextSize(2);
         display.setCursor(0, CONTENT_Y + 12);
         display.print(formatLabel(_indice, labelBuf, sizeof(labelBuf)));
-
+        display.setTextSize(1);
         display.setCursor(0, CONTENT_Y + 32);
         display.print(_onOffTemp ? "[ ON  ]" : "[ OFF ]");
 
     } else {
-        // ── Lista de controles ──────────────────────────
-        uint8_t startIdx = 0;
-        if (_indice >= 4) startIdx = _indice - 3;
-
-        uint8_t itemH = 10;
-        uint8_t y0 = CONTENT_Y;
+        uint8_t startIdx = (_indice >= 4) ? _indice - 3 : 0;
+        const uint8_t itemH = 10;
+        const uint8_t y0 = CONTENT_Y;
 
         for (uint8_t i = 0; i < 4 && (startIdx + i) < total; i++) {
             uint8_t idx = startIdx + i;
-            uint8_t cc = getCC(idx);
-            bool on = isHabilitado(idx);
+            uint8_t cc  = getCC(idx);
+            bool    on  = isHabilitado(idx);
 
             snprintf(_lineBuf[i], sizeof(_lineBuf[i]),
-                     "%s %s CC%d", on ? "*" : " ",
-                     formatLabel(idx, labelBuf, sizeof(labelBuf)), cc);
+                     "%s %s CC%d",
+                     on ? "*" : " ",
+                     formatLabel(idx, labelBuf, sizeof(labelBuf)),
+                     cc);
 
             int16_t y = y0 + i * (itemH + 2);
 
             if (idx == _indice) {
-                display.fillRect(0, y, 128, itemH, SSD1306_WHITE);
+                display.fillRect(0, y, OLED_WIDTH, itemH, SSD1306_WHITE);
                 display.setTextColor(SSD1306_BLACK);
             } else {
                 display.setTextColor(SSD1306_WHITE);
             }
-
             display.setCursor(2, y + 1);
             display.print(_lineBuf[i]);
         }

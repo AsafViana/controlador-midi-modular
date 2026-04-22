@@ -5,8 +5,8 @@
 #include "storage/Storage.h"
 #include "config.h"
 
-extern CCMapScreen  ccMapScreen;
-extern CanalScreen  canalScreen;
+extern CCMapScreen ccMapScreen;
+extern CanalScreen canalScreen;
 
 const char* ConfigScreen::_opcoes[] = {
     "Mapa CC",
@@ -36,11 +36,11 @@ void ConfigScreen::handleInput(NavInput input) {
 
     switch (input) {
         case NavInput::UP:
-            _lista.selectPrev();
+            _lista.handleInput(ButtonEvent::LONG_PRESS);
             markDirty();
             break;
         case NavInput::DOWN:
-            _lista.selectNext();
+            _lista.handleInput(ButtonEvent::SINGLE_CLICK);
             markDirty();
             break;
         case NavInput::SELECT:
