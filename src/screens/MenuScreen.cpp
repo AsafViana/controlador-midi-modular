@@ -25,6 +25,10 @@ MenuScreen::MenuScreen(OledApp* app)
 
 void MenuScreen::onMount() { markDirty(); }
 
+void MenuScreen::render(Adafruit_SSD1306& display) {
+    renderChildren(display);
+}
+
 void MenuScreen::handleInput(NavInput input) {
     Router& router = _app->getRouter();
 
@@ -33,20 +37,17 @@ void MenuScreen::handleInput(NavInput input) {
             _lista.selectPrev();
             markDirty();
             break;
-
         case NavInput::DOWN:
             _lista.selectNext();
             markDirty();
             break;
-
         case NavInput::SELECT:
             switch (_lista.getSelectedIndex()) {
                 case 0: router.push(&perfScreen);   break;
                 case 1: router.push(&configScreen); break;
-                case 2: /* Sobre — futuro */         break;
+                case 2: break;
             }
             break;
-
         default: break;
     }
 }

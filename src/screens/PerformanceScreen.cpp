@@ -12,6 +12,8 @@ PerformanceScreen::PerformanceScreen(MidiEngine* engine, Storage* storage)
     addChild(&_info);
 }
 
+void PerformanceScreen::setApp(OledApp* app) { _app = app; }
+
 void PerformanceScreen::onMount() { markDirty(); }
 
 void PerformanceScreen::handleInput(NavInput input) {
@@ -20,7 +22,10 @@ void PerformanceScreen::handleInput(NavInput input) {
     }
 }
 
-void PerformanceScreen::setApp(OledApp* app) { _app = app; }
+void PerformanceScreen::atualizarCC(uint8_t valor) {
+    (void)valor;
+    markDirty();
+}
 
 void PerformanceScreen::render(Adafruit_SSD1306& display) {
     renderChildren(display);

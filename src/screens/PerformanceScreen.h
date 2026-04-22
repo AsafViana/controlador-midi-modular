@@ -2,37 +2,27 @@
 
 #include "ui/Screen.h"
 #include "ui/components/TextComponent.h"
-#include "ui/components/ProgressBarComponent.h"
 #include "midi/MidiEngine.h"
-#include "midi/MidiCC.h"
 
 class OledApp;
 class Storage;
 
-/**
- * Tela de performance — onde o músico toca.
- *
- * Respeita o flag de teclado habilitado/desabilitado do Storage.
- * Se desabilitado, não envia notas.
- */
 class PerformanceScreen : public Screen {
 public:
     PerformanceScreen(MidiEngine* engine, Storage* storage);
 
-    void setApp(OledApp* app) { _app = app; }
+    void setApp(OledApp* app);
 
-    void handleInput(ButtonEvent event) override;
+    void handleInput(NavInput input) override;
     void onMount() override;
+    void render(Adafruit_SSD1306& display) override;
 
     void atualizarCC(uint8_t valor);
 
 private:
     MidiEngine* _engine;
     Storage* _storage;
-    OledApp* _app;
+    OledApp* _app = nullptr;
     TextComponent _titulo;
-    TextComponent _notaLabel;
-    TextComponent _ccLabel;
-    ProgressBarComponent _barra;
-    char _ccBuf[16];
+    TextComponent _info;
 };

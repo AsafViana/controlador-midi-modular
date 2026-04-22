@@ -2,6 +2,7 @@
 #include "screens/CCMapScreen.h"
 #include "screens/CanalScreen.h"
 #include "ui/OledApp.h"
+#include "storage/Storage.h"
 #include "config.h"
 
 extern CCMapScreen  ccMapScreen;
@@ -26,6 +27,10 @@ ConfigScreen::ConfigScreen(OledApp* app, Storage* storage)
 
 void ConfigScreen::onMount() { markDirty(); }
 
+void ConfigScreen::render(Adafruit_SSD1306& display) {
+    renderChildren(display);
+}
+
 void ConfigScreen::handleInput(NavInput input) {
     Router& router = _app->getRouter();
 
@@ -34,12 +39,10 @@ void ConfigScreen::handleInput(NavInput input) {
             _lista.selectPrev();
             markDirty();
             break;
-
         case NavInput::DOWN:
             _lista.selectNext();
             markDirty();
             break;
-
         case NavInput::SELECT:
             switch (_lista.getSelectedIndex()) {
                 case 0: router.push(&ccMapScreen);  break;
@@ -47,7 +50,6 @@ void ConfigScreen::handleInput(NavInput input) {
                 case 2: router.pop();               break;
             }
             break;
-
         default: break;
     }
 }

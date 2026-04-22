@@ -6,18 +6,13 @@
 
 class OledApp;
 
-/**
- * Tela de menu principal do teclado.
- *
- * Exibe uma lista de opções navegável. Clique simples desce,
- * long press sobe, double click confirma a opção selecionada.
- */
 class MenuScreen : public Screen {
 public:
     MenuScreen(OledApp* app);
 
-    void handleInput(ButtonEvent event) override;
+    void handleInput(NavInput input) override;
     void onMount() override;
+    void render(Adafruit_SSD1306& display) override;
 
 private:
     OledApp* _app;

@@ -7,20 +7,13 @@
 class OledApp;
 class Storage;
 
-/**
- * Tela de configurações do teclado.
- *
- * Lista de parâmetros configuráveis. Navegação:
- *   - SINGLE_CLICK: Desce na lista
- *   - DOUBLE_CLICK: Entra na sub-tela do item selecionado
- *   - LONG_PRESS:   Voltar
- */
 class ConfigScreen : public Screen {
 public:
     ConfigScreen(OledApp* app, Storage* storage);
 
-    void handleInput(ButtonEvent event) override;
+    void handleInput(NavInput input) override;
     void onMount() override;
+    void render(Adafruit_SSD1306& display) override;
 
 private:
     OledApp* _app;
@@ -28,6 +21,6 @@ private:
     TextComponent _titulo;
     ListComponent _lista;
 
-    static const char* _configs[];
-    static constexpr uint8_t NUM_CONFIGS = 3;
+    static const char* _opcoes[];
+    static constexpr uint8_t NUM_OPCOES = 3;
 };
