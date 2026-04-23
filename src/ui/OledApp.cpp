@@ -13,17 +13,18 @@
 bool OledApp::begin(uint8_t i2cAddress) {
     Wire.begin(HardwareMap::PIN_I2C_SDA, HardwareMap::PIN_I2C_SCL);
 
-    _display = Adafruit_SSD1306(OLED_WIDTH, OLED_HEIGHT, &Wire, -1);
+    // Instancia apenas aqui, apos Wire.begin() — nunca no construtor global
+    _display = new Adafruit_SSD1306(OLED_WIDTH, OLED_HEIGHT, &Wire, -1);
 
-    if (!_display.begin(SSD1306_SWITCHCAPVCC, i2cAddress)) {
+    if (!_display->begin(SSD1306_SWITCHCAPVCC, i2cAddress)) {
         Serial.println("Erro: falha ao inicializar display SSD1306");
         return false;
     }
 
     _midiActivity = MidiActivityComponent(OLED_WIDTH - 8, 1, 6);
 
-    _display.clearDisplay();
-    _display.display();
+    _display->clearDisplay();
+    _display->display();
     return true;
 }
 
@@ -35,6 +36,8 @@ Router& OledApp::getRouter()                         { return _router; }
 MidiActivityComponent& OledApp::getMidiActivity()    { return _midiActivity; }
 
 void OledApp::update() {
+    if (_display == nullptr) return;
+
     uint32_t now = millis();
     if (now - _lastFrameTime < FRAME_INTERVAL_MS) return;
     _lastFrameTime = now;
@@ -60,7 +63,6 @@ void OledApp::update() {
         Serial.println(s != nullptr ? "OK" : "NULL");
     }
 
-    // Leitura dos botoes
     if (_btnUp) {
         ButtonEvent ev = _btnUp->update();
         if (ev == ButtonEvent::PRESSED) {
@@ -88,12 +90,12 @@ void OledApp::update() {
     bool midiActive  = _midiActivity.isActive();
 
     if (needsRedraw || midiActive) {
-        _display.clearDisplay();
+        _display->clearDisplay();
         if (screen != nullptr) {
-            screen->render(_display);
+            screen->render(*_display);
             screen->clearDirty();
         }
-        _midiActivity.render(_display);
-        _display.display();
+        _midiActivity.render(*_display);
+        _display->display();
     }
 }

@@ -10,7 +10,8 @@ namespace App { class Button; }
 
 class OledApp {
 public:
-    OledApp() : _midiActivity(112, 0, 6) {}
+    OledApp() : _midiActivity(112, 0, 6), _display(nullptr) {}
+    ~OledApp() { delete _display; }
 
     bool begin(uint8_t i2cAddress = 0x3C);
     void update();
@@ -23,7 +24,7 @@ public:
     MidiActivityComponent& getMidiActivity();
 
 private:
-    Adafruit_SSD1306 _display;
+    Adafruit_SSD1306* _display;   // instanciado em begin(), nao no construtor global
     Router _router;
     MidiActivityComponent _midiActivity;
 
@@ -33,6 +34,4 @@ private:
 
     uint32_t _lastFrameTime = 0;
     static constexpr uint32_t FRAME_INTERVAL_MS = 33;
-
-    void _pollButton(App::Button* btn, NavInput role);
 };
