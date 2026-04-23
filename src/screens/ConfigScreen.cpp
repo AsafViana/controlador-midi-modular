@@ -5,24 +5,25 @@
 #include "storage/Storage.h"
 #include "config.h"
 
-extern CCMapScreen ccMapScreen;
-extern CanalScreen canalScreen;
-
 const char* ConfigScreen::_opcoes[] = {
     "Mapa CC",
     "Canal MIDI",
     "Voltar"
 };
 
-ConfigScreen::ConfigScreen(OledApp* app, Storage* storage)
+ConfigScreen::ConfigScreen(OledApp* app, Storage* storage, CCMapScreen* ccMap, CanalScreen* canal)
     : _app(app)
     , _storage(storage)
+    , _ccMap(ccMap)
+    , _canal(canal)
     , _titulo(0, 0, "Configuracoes", 1)
     , _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT, 1)
 {
     addChild(&_titulo);
     addChild(&_lista);
     _lista.setItems(_opcoes, NUM_OPCOES);
+    _lista.setUpButton(ButtonEvent::LONG_PRESS);
+    _lista.setDownButton(ButtonEvent::SINGLE_CLICK);
 }
 
 void ConfigScreen::onMount() { markDirty(); }
@@ -45,9 +46,9 @@ void ConfigScreen::handleInput(NavInput input) {
             break;
         case NavInput::SELECT:
             switch (_lista.getSelectedIndex()) {
-                case 0: router.push(&ccMapScreen);  break;
-                case 1: router.push(&canalScreen);  break;
-                case 2: router.pop();               break;
+                case 0: if (_ccMap) router.push(_ccMap); break;
+                case 1: if (_canal) router.push(_canal); break;
+                case 2: router.pop();                    break;
             }
             break;
         default: break;

@@ -14,22 +14,21 @@
 #include "screens/CCMapScreen.h"
 #include "screens/CanalScreen.h"
 
-// Ponteiros globais — objetos criados no setup() para evitar crash no boot
-static MidiEngine*        engine        = nullptr;
-static Storage*           storage       = nullptr;
-static WireI2CBus*        i2cBus        = nullptr;
-static I2CScanner*        scanner       = nullptr;
-static UnifiedControlList* ucl          = nullptr;
-static OledApp*           app           = nullptr;
-static App::Button*       btnUp         = nullptr;
-static App::Button*       btnDown       = nullptr;
-static App::Button*       btnSelect     = nullptr;
-static ControlReader*     controlReader = nullptr;
-static PerformanceScreen* perfScreen    = nullptr;
-static ConfigScreen*      configScreen  = nullptr;
-static CCMapScreen*       ccMapScreen   = nullptr;
-static CanalScreen*       canalScreen   = nullptr;
-static MenuScreen*        menuScreen    = nullptr;
+static MidiEngine*         engine        = nullptr;
+static Storage*            storage       = nullptr;
+static WireI2CBus*         i2cBus        = nullptr;
+static I2CScanner*         scanner       = nullptr;
+static UnifiedControlList* ucl           = nullptr;
+static OledApp*            app           = nullptr;
+static App::Button*        btnUp         = nullptr;
+static App::Button*        btnDown       = nullptr;
+static App::Button*        btnSelect     = nullptr;
+static ControlReader*      controlReader = nullptr;
+static PerformanceScreen*  perfScreen    = nullptr;
+static CCMapScreen*        ccMapScreen   = nullptr;
+static CanalScreen*        canalScreen   = nullptr;
+static ConfigScreen*       configScreen  = nullptr;
+static MenuScreen*         menuScreen    = nullptr;
 
 void onMidiActivity() {
     if (app) app->getMidiActivity().trigger();
@@ -69,18 +68,23 @@ void setup() {
         Serial.println("Falha ao inicializar display OLED!");
     }
 
+    // Telas sem dependencias entre si primeiro
     Serial.println("[7] screens");
-    perfScreen   = new PerformanceScreen(engine, storage);
-    configScreen = new ConfigScreen(app, storage);
-    ccMapScreen  = new CCMapScreen(storage, ucl);
-    canalScreen  = new CanalScreen(storage);
-    menuScreen   = new MenuScreen(app);
+    perfScreen  = new PerformanceScreen(engine, storage);
+    ccMapScreen = new CCMapScreen(storage, ucl);
+    canalScreen = new CanalScreen(storage);
+
+    // ConfigScreen recebe ccMap e canal como destinos
+    configScreen = new ConfigScreen(app, storage, ccMapScreen, canalScreen);
+
+    // MenuScreen recebe perf e config como destinos
+    menuScreen = new MenuScreen(app, perfScreen, configScreen);
 
     perfScreen->setApp(app);
     ccMapScreen->setApp(app);
     canalScreen->setApp(app);
 
-    Serial.println("[8] activity callback");
+    Serial.println("[8] activity");
     engine->onActivity(onMidiActivity);
 
     Serial.println("[9] buttons");
