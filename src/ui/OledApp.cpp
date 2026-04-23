@@ -34,25 +34,21 @@ void OledApp::setButtonSelect(App::Button* btn) { _btnSelect = btn; }
 Router& OledApp::getRouter()                         { return _router; }
 MidiActivityComponent& OledApp::getMidiActivity()    { return _midiActivity; }
 
+// Todos os botoes de navegacao disparam no PRESSED — sem esperar janela de double-click
+static void pollNav(App::Button* btn, NavInput role, Router& router) {
+    if (btn == nullptr) return;
+    if (btn->update() == ButtonEvent::PRESSED)
+        router.handleInput(role);
+}
+
 void OledApp::update() {
     uint32_t now = millis();
     if (now - _lastFrameTime < FRAME_INTERVAL_MS) return;
     _lastFrameTime = now;
 
-    // UP e DOWN: respondem imediatamente no PRESSED (sem esperar double-click)
-    if (_btnUp) {
-        ButtonEvent ev = _btnUp->update();
-        if (ev == ButtonEvent::PRESSED) _router.handleInput(NavInput::UP);
-    }
-    if (_btnDown) {
-        ButtonEvent ev = _btnDown->update();
-        if (ev == ButtonEvent::PRESSED) _router.handleInput(NavInput::DOWN);
-    }
-    // SELECT: aguarda SINGLE_CLICK (soltar o botão) para evitar acionamento duplo
-    if (_btnSelect) {
-        ButtonEvent ev = _btnSelect->update();
-        if (ev == ButtonEvent::SINGLE_CLICK) _router.handleInput(NavInput::SELECT);
-    }
+    pollNav(_btnUp,     NavInput::UP,     _router);
+    pollNav(_btnDown,   NavInput::DOWN,   _router);
+    pollNav(_btnSelect, NavInput::SELECT, _router);
 
     Screen* screen   = _router.currentScreen();
     bool needsRedraw = (screen != nullptr && screen->isDirty());
