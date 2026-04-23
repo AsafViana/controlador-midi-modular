@@ -68,4 +68,7 @@ private:
 
     /// Ajusta scrollOffset para manter selectedIndex na janela visível.
     void scrollToSelected();
+
+    /// Padding à esquerda do texto dentro de cada item (pixels).
+    static constexpr int16_t TEXT_PADDING_LEFT = 2;
 };

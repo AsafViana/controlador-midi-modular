@@ -11,8 +11,10 @@ CCMapScreen::CCMapScreen(Storage* storage, UnifiedControlList* ucl)
     , _app(nullptr)
     , _ucl(ucl)
     , _titulo(0, 0, "Endereco CC", 1)
+    , _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1)
 {
     addChild(&_titulo);
+    addChild(&_voltar);
 }
 
 uint8_t CCMapScreen::getTotalControles() const {

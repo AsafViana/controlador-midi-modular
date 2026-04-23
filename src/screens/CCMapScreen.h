@@ -23,6 +23,7 @@ private:
     OledApp* _app = nullptr;
     UnifiedControlList* _ucl;
     TextComponent _titulo;
+    TextComponent _voltar;
 
     uint8_t _indice = 0;
 

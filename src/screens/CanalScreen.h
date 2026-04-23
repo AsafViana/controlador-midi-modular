@@ -20,6 +20,7 @@ private:
     Storage* _storage;
     OledApp* _app = nullptr;
     TextComponent _titulo;
+    TextComponent _voltar;
     TextComponent _valorComp;
     uint8_t _canal = 1;
 };

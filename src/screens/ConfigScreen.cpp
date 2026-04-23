@@ -17,9 +17,11 @@ ConfigScreen::ConfigScreen(OledApp* app, Storage* storage, CCMapScreen* ccMap, C
     , _ccMap(ccMap)
     , _canal(canal)
     , _titulo(0, 0, "Configuracoes", 1)
+    , _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1)
     , _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT, 1)
 {
     addChild(&_titulo);
+    addChild(&_voltar);
     addChild(&_lista);
     _lista.setItems(_opcoes, NUM_OPCOES);
     _lista.setUpButton(ButtonEvent::LONG_PRESS);

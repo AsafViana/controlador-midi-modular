@@ -6,9 +6,11 @@
 CanalScreen::CanalScreen(Storage* storage)
     : _storage(storage)
     , _titulo(0, 0, "Canal MIDI", 1)
+    , _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1)
     , _valorComp(0, CONTENT_Y, "1", 2)
 {
     addChild(&_titulo);
+    addChild(&_voltar);
     addChild(&_valorComp);
 }
 

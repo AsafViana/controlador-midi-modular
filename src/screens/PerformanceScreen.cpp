@@ -6,9 +6,11 @@ PerformanceScreen::PerformanceScreen(MidiEngine* engine, Storage* storage)
     : _engine(engine)
     , _storage(storage)
     , _titulo(0, 0, "Performance", 1)
+    , _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1)
     , _info(0, CONTENT_Y, "Aguardando MIDI...", 1)
 {
     addChild(&_titulo);
+    addChild(&_voltar);
     addChild(&_info);
 }
 

@@ -23,6 +23,7 @@ private:
     CCMapScreen* _ccMap;
     CanalScreen* _canal;
     TextComponent _titulo;
+    TextComponent _voltar;
     ListComponent _lista;
 
     static const char* _opcoes[];

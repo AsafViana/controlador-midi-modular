@@ -46,7 +46,7 @@ void ListComponent::render(Adafruit_SSD1306& display) {
             display.setTextColor(SSD1306_WHITE);
         }
 
-        display.setCursor(_x, itemY);
+        display.setCursor(_x + TEXT_PADDING_LEFT, itemY);
         display.print(text);
     }
 }
