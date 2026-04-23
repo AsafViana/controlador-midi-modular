@@ -45,28 +45,46 @@ void onMidiActivity() {
 }
 
 void setup() {
+    // PRIMEIRA LINHA: garante Serial antes de qualquer init
     Serial.begin(115200);
+    delay(500); // aguarda USB enumerar
+    Serial.println("=== BOOT START ===");
+
+    Serial.println("[1] engine.begin");
     engine.begin();
+
+    Serial.println("[2] storage.begin");
     storage.begin();
 
+    Serial.println("[3] i2c.begin");
     i2cBus.begin();
+
+    Serial.println("[4] scanner.scan");
     scanner.scan();
+
+    Serial.println("[5] ucl.rebuild");
     ucl.rebuild();
+
+    Serial.println("[6] controlReader.begin");
     controlReader.begin();
 
+    Serial.println("[7] pinMode LED");
     pinMode(HardwareMap::PIN_LED, OUTPUT);
 
+    Serial.println("[8] app.begin");
     if (!app.begin(DISPLAY_I2C_ADDRESS)) {
         Serial.println("Falha ao inicializar display OLED!");
     }
 
+    Serial.println("[9] engine.onActivity");
     engine.onActivity(onMidiActivity);
 
+    Serial.println("[10] setApp");
     perfScreen.setApp(&app);
     ccMapScreen.setApp(&app);
     canalScreen.setApp(&app);
 
-    // Cada botão com papel fixo
+    Serial.println("[11] buttons");
     btnUp.begin();
     btnDown.begin();
     btnSelect.begin();
@@ -74,9 +92,10 @@ void setup() {
     app.setButtonDown(&btnDown);
     app.setButtonSelect(&btnSelect);
 
+    Serial.println("[12] router.push");
     app.getRouter().push(&menuScreen);
 
-    Serial.println("Sistema iniciado.");
+    Serial.println("=== BOOT OK ===");
 }
 
 void loop() {
