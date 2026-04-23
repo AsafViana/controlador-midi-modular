@@ -14,93 +14,95 @@
 #include "screens/CCMapScreen.h"
 #include "screens/CanalScreen.h"
 
-// ── Módulos ──────────────────────────────────────────────
-MidiEngine engine;
-Storage storage;
+// Ponteiros globais — objetos criados no setup() para evitar crash no boot
+static MidiEngine*        engine        = nullptr;
+static Storage*           storage       = nullptr;
+static WireI2CBus*        i2cBus        = nullptr;
+static I2CScanner*        scanner       = nullptr;
+static UnifiedControlList* ucl          = nullptr;
+static OledApp*           app           = nullptr;
+static App::Button*       btnUp         = nullptr;
+static App::Button*       btnDown       = nullptr;
+static App::Button*       btnSelect     = nullptr;
+static ControlReader*     controlReader = nullptr;
+static PerformanceScreen* perfScreen    = nullptr;
+static ConfigScreen*      configScreen  = nullptr;
+static CCMapScreen*       ccMapScreen   = nullptr;
+static CanalScreen*       canalScreen   = nullptr;
+static MenuScreen*        menuScreen    = nullptr;
 
-// ── I2C — Expansão modular ───────────────────────────────
-WireI2CBus i2cBus;
-I2CScanner scanner(&i2cBus);
-UnifiedControlList ucl(&scanner);
-
-// ── UI ───────────────────────────────────────────────────
-OledApp app;
-App::Button btnUp(HardwareMap::PIN_BTN_UP, true);
-App::Button btnDown(HardwareMap::PIN_BTN_DOWN, true);
-App::Button btnSelect(HardwareMap::PIN_BTN_SELECT, true);
-
-// ── Leitura automática de controles analógicos ───────────
-ControlReader controlReader(&engine, &storage, &ucl, &scanner);
-
-// ── Telas ────────────────────────────────────────────────
-PerformanceScreen perfScreen(&engine, &storage);
-ConfigScreen configScreen(&app, &storage);
-CCMapScreen ccMapScreen(&storage, &ucl);
-CanalScreen canalScreen(&storage);
-MenuScreen menuScreen(&app);
-
-// ── Callback de atividade MIDI ───────────────────────────
 void onMidiActivity() {
-    app.getMidiActivity().trigger();
+    if (app) app->getMidiActivity().trigger();
 }
 
 void setup() {
-    // PRIMEIRA LINHA: garante Serial antes de qualquer init
     Serial.begin(115200);
-    delay(500); // aguarda USB enumerar
+    delay(500);
     Serial.println("=== BOOT START ===");
 
-    Serial.println("[1] engine.begin");
-    engine.begin();
+    Serial.println("[1] engine");
+    engine = new MidiEngine();
+    engine->begin();
 
-    Serial.println("[2] storage.begin");
-    storage.begin();
+    Serial.println("[2] storage");
+    storage = new Storage();
+    storage->begin();
 
-    Serial.println("[3] i2c.begin");
-    i2cBus.begin();
+    Serial.println("[3] i2c");
+    i2cBus  = new WireI2CBus();
+    scanner = new I2CScanner(i2cBus);
+    ucl     = new UnifiedControlList(scanner);
+    i2cBus->begin();
+    scanner->scan();
+    ucl->rebuild();
 
-    Serial.println("[4] scanner.scan");
-    scanner.scan();
+    Serial.println("[4] controlReader");
+    controlReader = new ControlReader(engine, storage, ucl, scanner);
+    controlReader->begin();
 
-    Serial.println("[5] ucl.rebuild");
-    ucl.rebuild();
-
-    Serial.println("[6] controlReader.begin");
-    controlReader.begin();
-
-    Serial.println("[7] pinMode LED");
+    Serial.println("[5] LED");
     pinMode(HardwareMap::PIN_LED, OUTPUT);
 
-    Serial.println("[8] app.begin");
-    if (!app.begin(DISPLAY_I2C_ADDRESS)) {
+    Serial.println("[6] app");
+    app = new OledApp();
+    if (!app->begin(DISPLAY_I2C_ADDRESS)) {
         Serial.println("Falha ao inicializar display OLED!");
     }
 
-    Serial.println("[9] engine.onActivity");
-    engine.onActivity(onMidiActivity);
+    Serial.println("[7] screens");
+    perfScreen   = new PerformanceScreen(engine, storage);
+    configScreen = new ConfigScreen(app, storage);
+    ccMapScreen  = new CCMapScreen(storage, ucl);
+    canalScreen  = new CanalScreen(storage);
+    menuScreen   = new MenuScreen(app);
 
-    Serial.println("[10] setApp");
-    perfScreen.setApp(&app);
-    ccMapScreen.setApp(&app);
-    canalScreen.setApp(&app);
+    perfScreen->setApp(app);
+    ccMapScreen->setApp(app);
+    canalScreen->setApp(app);
 
-    Serial.println("[11] buttons");
-    btnUp.begin();
-    btnDown.begin();
-    btnSelect.begin();
-    app.setButtonUp(&btnUp);
-    app.setButtonDown(&btnDown);
-    app.setButtonSelect(&btnSelect);
+    Serial.println("[8] activity callback");
+    engine->onActivity(onMidiActivity);
 
-    Serial.println("[12] router.push");
-    app.getRouter().push(&menuScreen);
+    Serial.println("[9] buttons");
+    btnUp     = new App::Button(HardwareMap::PIN_BTN_UP,     true);
+    btnDown   = new App::Button(HardwareMap::PIN_BTN_DOWN,   true);
+    btnSelect = new App::Button(HardwareMap::PIN_BTN_SELECT, true);
+    btnUp->begin();
+    btnDown->begin();
+    btnSelect->begin();
+    app->setButtonUp(btnUp);
+    app->setButtonDown(btnDown);
+    app->setButtonSelect(btnSelect);
+
+    Serial.println("[10] router");
+    app->getRouter().push(menuScreen);
 
     Serial.println("=== BOOT OK ===");
 }
 
 void loop() {
-    controlReader.update();
-    scanner.periodicScan();
-    ucl.rebuild();
-    app.update();
+    if (controlReader) controlReader->update();
+    if (scanner)       scanner->periodicScan();
+    if (ucl)           ucl->rebuild();
+    if (app)           app->update();
 }
