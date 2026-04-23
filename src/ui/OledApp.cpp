@@ -34,21 +34,54 @@ void OledApp::setButtonSelect(App::Button* btn) { _btnSelect = btn; }
 Router& OledApp::getRouter()                         { return _router; }
 MidiActivityComponent& OledApp::getMidiActivity()    { return _midiActivity; }
 
-// Todos os botoes de navegacao disparam no PRESSED — sem esperar janela de double-click
-static void pollNav(App::Button* btn, NavInput role, Router& router) {
-    if (btn == nullptr) return;
-    if (btn->update() == ButtonEvent::PRESSED)
-        router.handleInput(role);
-}
-
 void OledApp::update() {
     uint32_t now = millis();
     if (now - _lastFrameTime < FRAME_INTERVAL_MS) return;
     _lastFrameTime = now;
 
-    pollNav(_btnUp,     NavInput::UP,     _router);
-    pollNav(_btnDown,   NavInput::DOWN,   _router);
-    pollNav(_btnSelect, NavInput::SELECT, _router);
+    // --- DEBUG: leitura raw dos pinos ---
+    static uint32_t lastDebugPrint = 0;
+    if (now - lastDebugPrint > 2000) {
+        lastDebugPrint = now;
+        Serial.print("[BTN RAW] UP=");
+        Serial.print(digitalRead(HardwareMap::PIN_BTN_UP));
+        Serial.print(" DOWN=");
+        Serial.print(digitalRead(HardwareMap::PIN_BTN_DOWN));
+        Serial.print(" SELECT=");
+        Serial.println(digitalRead(HardwareMap::PIN_BTN_SELECT));
+        Serial.print("[BTN PTR] up=");
+        Serial.print(_btnUp != nullptr ? "OK" : "NULL");
+        Serial.print(" down=");
+        Serial.print(_btnDown != nullptr ? "OK" : "NULL");
+        Serial.print(" select=");
+        Serial.println(_btnSelect != nullptr ? "OK" : "NULL");
+        Screen* s = _router.currentScreen();
+        Serial.print("[ROUTER] screen=");
+        Serial.println(s != nullptr ? "OK" : "NULL");
+    }
+
+    // Leitura dos botoes
+    if (_btnUp) {
+        ButtonEvent ev = _btnUp->update();
+        if (ev == ButtonEvent::PRESSED) {
+            Serial.println("[NAV] UP PRESSED");
+            _router.handleInput(NavInput::UP);
+        }
+    }
+    if (_btnDown) {
+        ButtonEvent ev = _btnDown->update();
+        if (ev == ButtonEvent::PRESSED) {
+            Serial.println("[NAV] DOWN PRESSED");
+            _router.handleInput(NavInput::DOWN);
+        }
+    }
+    if (_btnSelect) {
+        ButtonEvent ev = _btnSelect->update();
+        if (ev == ButtonEvent::PRESSED) {
+            Serial.println("[NAV] SELECT PRESSED");
+            _router.handleInput(NavInput::SELECT);
+        }
+    }
 
     Screen* screen   = _router.currentScreen();
     bool needsRedraw = (screen != nullptr && screen->isDirty());
