@@ -34,23 +34,25 @@ void OledApp::setButtonSelect(App::Button* btn) { _btnSelect = btn; }
 Router& OledApp::getRouter()                         { return _router; }
 MidiActivityComponent& OledApp::getMidiActivity()    { return _midiActivity; }
 
-void OledApp::_pollButton(App::Button* btn, NavInput role) {
-    if (btn == nullptr) return;
-    ButtonEvent ev = btn->update();
-    // Dispara apenas no SINGLE_CLICK (borda de pressão limpa)
-    if (ev == ButtonEvent::SINGLE_CLICK) {
-        _router.handleInput(role);
-    }
-}
-
 void OledApp::update() {
     uint32_t now = millis();
     if (now - _lastFrameTime < FRAME_INTERVAL_MS) return;
     _lastFrameTime = now;
 
-    _pollButton(_btnUp,     NavInput::UP);
-    _pollButton(_btnDown,   NavInput::DOWN);
-    _pollButton(_btnSelect, NavInput::SELECT);
+    // UP e DOWN: respondem imediatamente no PRESSED (sem esperar double-click)
+    if (_btnUp) {
+        ButtonEvent ev = _btnUp->update();
+        if (ev == ButtonEvent::PRESSED) _router.handleInput(NavInput::UP);
+    }
+    if (_btnDown) {
+        ButtonEvent ev = _btnDown->update();
+        if (ev == ButtonEvent::PRESSED) _router.handleInput(NavInput::DOWN);
+    }
+    // SELECT: aguarda SINGLE_CLICK (soltar o botão) para evitar acionamento duplo
+    if (_btnSelect) {
+        ButtonEvent ev = _btnSelect->update();
+        if (ev == ButtonEvent::SINGLE_CLICK) _router.handleInput(NavInput::SELECT);
+    }
 
     Screen* screen   = _router.currentScreen();
     bool needsRedraw = (screen != nullptr && screen->isDirty());
