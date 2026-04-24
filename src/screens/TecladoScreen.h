@@ -7,9 +7,14 @@
 
 class OledApp;
 
-class CanalScreen : public Screen {
+/**
+ * TecladoScreen — Tela para habilitar/desabilitar o teclado (notas).
+ *
+ * UP/DOWN alterna entre ON e OFF, SELECT confirma e volta.
+ */
+class TecladoScreen : public Screen {
 public:
-  CanalScreen(Storage *storage);
+  TecladoScreen(Storage *storage);
 
   void setApp(OledApp *app);
 
@@ -23,6 +28,5 @@ private:
   TextComponent _titulo;
   TextComponent _voltar;
   TextComponent _valorComp;
-  uint8_t _canal = 1;
-  char _buf[4];
+  bool _habilitado = true;
 };

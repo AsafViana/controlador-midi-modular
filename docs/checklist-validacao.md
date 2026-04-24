@@ -10,7 +10,7 @@
 - [x] Leitura dos potenciômetros locais e envio de CC
 - [x] Configuração de CC por controle pela tela (`CCMapScreen`)
 - [x] Persistência no NVS — sobrevive a reboot
-- [x] Navegação na interface (esquema: `SINGLE_CLICK` navega, `DOUBLE_CLICK` confirma, `LONG_PRESS` volta)
+- [x] Navegação na interface (3 botões: UP sobe/incrementa, DOWN desce/decrementa, SELECT confirma/entra)
 - [x] Habilitar/desabilitar controles individuais
 - [x] Canal MIDI configurável (1-16)
 - [x] Layout do display respeitando header amarelo (Y 0-15) e conteúdo azul (Y 16-63)
@@ -68,7 +68,7 @@ A zona morta (`ZONA_MORTA = 1`) é a mesma para locais e remotos. Se os potenci�
 - [ ] Mudar o canal MIDI e verificar que **todos os controles usam o novo canal**
 - [ ] Navegar por todas as telas sem travamento
 - [ ] Verificar que a zona morta está filtrando ruído **sem engolir movimentos reais** dos pots
-- [ ] Testar os 3 gestos de botão em cada tela (clique, duplo clique, segurar)
+- [ ] Testar os 3 botões (UP, DOWN, SELECT) em cada tela
 
 ---
 
@@ -86,11 +86,15 @@ A zona morta (`ZONA_MORTA = 1`) é a mesma para locais e remotos. Se os potenci�
 
 ## 📐 Esquema de navegação atual
 
-| Gesto | Ação |
-|---|---|
-| **Clique simples** (`SINGLE_CLICK`) | Navegar para baixo / incrementar valor |
-| **Duplo clique** (`DOUBLE_CLICK`) | Confirmar / entrar na opção |
-| **Segurar** (`LONG_PRESS`) | Voltar / subir na lista (MenuScreen) / decrementar (edição CC) |
+O sistema usa 3 botões físicos, cada um mapeado para uma ação fixa:
+
+| Botão | NavInput | Ação |
+|---|---|---|
+| **UP** (GPIO 11) | `NavInput::UP` | Subir na lista / incrementar valor |
+| **DOWN** (GPIO 12) | `NavInput::DOWN` | Descer na lista / decrementar valor |
+| **SELECT** (GPIO 13) | `NavInput::SELECT` | Confirmar / entrar / voltar |
+
+Cada botão gera um evento `PRESSED` que o `OledApp` converte para o `NavInput` correspondente e encaminha à tela ativa.
 
 ---
 

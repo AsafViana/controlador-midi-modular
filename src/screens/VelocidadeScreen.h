@@ -7,9 +7,14 @@
 
 class OledApp;
 
-class CanalScreen : public Screen {
+/**
+ * VelocidadeScreen — Tela para configurar a velocidade MIDI (1-127).
+ *
+ * UP incrementa, DOWN decrementa, SELECT confirma e volta.
+ */
+class VelocidadeScreen : public Screen {
 public:
-  CanalScreen(Storage *storage);
+  VelocidadeScreen(Storage *storage);
 
   void setApp(OledApp *app);
 
@@ -23,6 +28,6 @@ private:
   TextComponent _titulo;
   TextComponent _voltar;
   TextComponent _valorComp;
-  uint8_t _canal = 1;
+  uint8_t _velocidade = 100;
   char _buf[4];
 };

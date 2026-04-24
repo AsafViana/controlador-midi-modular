@@ -45,7 +45,7 @@
 
 - [ ] Na tela `Endereco CC`, selecionar um controle remoto
 - [ ] Editar o número CC (ex: mudar de 0 para 74)
-- [ ] Confirmar com `DOUBLE_CLICK`
+- [ ] Confirmar com `SELECT`
 - [ ] Mover o potenciômetro remoto e verificar que o CC enviado é o **novo valor** (74)
 - [ ] Habilitar/desabilitar o controle remoto e verificar que ele **para/volta** a enviar CC
 

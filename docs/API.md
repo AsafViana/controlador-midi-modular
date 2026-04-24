@@ -15,6 +15,7 @@ Referência completa de todos os módulos, suas funções e exemplos de uso.
   - [ButtonEvent](#buttonevent)
   - [Button](#button)
 - [Módulo UI](#módulo-ui)
+  - [NavInput](#navinput)
   - [OledApp](#oledapp)
   - [Router](#router)
   - [Screen](#screen)
@@ -24,6 +25,17 @@ Referência completa de todos os módulos, suas funções e exemplos de uso.
   - [IconComponent](#iconcomponent)
   - [ListComponent](#listcomponent)
   - [ProgressBarComponent](#progressbarcomponent)
+  - [MidiActivityComponent](#midiactivitycomponent)
+- [Módulo Storage](#módulo-storage)
+- [Módulo Hardware](#módulo-hardware)
+  - [CCActivityInfo](#ccactivityinfo)
+  - [ControlReader](#controlreader)
+- [Módulo I2C](#módulo-i2c)
+  - [I2CBus](#i2cbus)
+  - [I2CScanner](#i2cscanner)
+  - [ModuleDescriptor](#moduledescriptor)
+  - [UnifiedControlList](#unifiedcontrollist)
+- [Telas](#telas)
 - [Exemplo Completo](#exemplo-completo)
 
 ---
@@ -39,8 +51,11 @@ Constantes globais usadas por todos os módulos. Edite `src/config.h` para ajust
 | `MIDI_DEFAULT_CHANNEL` | `1` | Canal MIDI padrão (1-16) |
 | `MIDI_DEFAULT_CC_VALUE` | `0` | Valor padrão para mensagens CC |
 | `DISPLAY_I2C_ADDRESS` | `0x3C` | Endereço I2C do display OLED |
-| `DISPLAY_WIDTH` | `128` | Largura do display em pixels |
-| `DISPLAY_HEIGHT` | `64` | Altura do display em pixels |
+| `OLED_WIDTH` | `128` | Largura do display em pixels |
+| `OLED_HEIGHT` | `64` | Altura do display em pixels |
+| `HEADER_HEIGHT` | `16` | Altura da faixa amarela do display (Y 0-15) |
+| `CONTENT_Y` | `16` | Início da área de conteúdo azul |
+| `CONTENT_HEIGHT` | `48` | Altura da área de conteúdo (64 - 16) |
 
 ---
 
@@ -148,7 +163,7 @@ MidiCC sustainOff(64, 0);
 
 ### MidiEngine
 
-Classe principal para envio de mensagens MIDI via USB.
+Classe principal para envio de mensagens MIDI via USB e DIN (Serial1 a 31250 baud). Todas as mensagens são enviadas simultaneamente por ambas as interfaces.
 
 **Incluir:**
 
@@ -158,7 +173,7 @@ Classe principal para envio de mensagens MIDI via USB.
 
 #### `void begin()`
 
-Inicializa a interface USB MIDI. Deve ser chamado uma vez no `setup()`.
+Inicializa as interfaces USB MIDI e MIDI DIN (Serial1 a 31250 baud). Deve ser chamado uma vez no `setup()`.
 
 ```cpp
 MidiEngine engine;
@@ -345,6 +360,27 @@ void loop() {
 
 ## Módulo UI
 
+### NavInput
+
+Enum que identifica qual botão físico foi pressionado. Usado pelas Screens para processar navegação.
+
+**Incluir:**
+
+```cpp
+#include "ui/NavInput.h"
+```
+
+| Valor | Descrição |
+|-------|-----------|
+| `NONE` | Nenhum botão |
+| `UP` | Botão de cima — sobe na lista / incrementa valor |
+| `DOWN` | Botão de baixo — desce na lista / decrementa valor |
+| `SELECT` | Botão de seleção — confirma / entra |
+| `LONG_UP` | Botão de cima mantido — incremento rápido (+5 em valores, +2/+3 em ranges pequenos) |
+| `LONG_DOWN` | Botão de baixo mantido — decremento rápido (-5 em valores, -2/-3 em ranges pequenos) |
+
+---
+
 ### OledApp
 
 Fachada principal do framework de UI OLED. Ponto de entrada para o desenvolvedor.
@@ -359,17 +395,48 @@ Fachada principal do framework de UI OLED. Ponto de entrada para o desenvolvedor
 
 Inicializa o display SSD1306 via I2C. Retorna `true` se bem-sucedido.
 
+#### `void showSplash(const char* nome, const char* versao, uint16_t duracaoMs = 1500)`
+
+Exibe uma tela de splash com o nome do produto e versão do firmware, centralizado no display. Bloqueia por `duracaoMs` milissegundos. Chamar logo após `begin()` no `setup()`.
+
+```cpp
+app.begin(0x3C);
+app.showSplash("MIDI Ctrl", "v1.0.0");  // Exibe por 1.5s
+```
+
+#### `void showSaveConfirm()`
+
+Feedback visual rápido de "salvo" — inverte o display por 150ms e volta ao normal. Chamar antes de `router.pop()` nas telas de configuração.
+
+```cpp
+_storage->setCanalMidi(_canal);
+_app->showSaveConfirm();  // Flash visual
+_app->getRouter().pop();
+```
+
 #### `void update()`
 
 Loop principal — consulta botões, encaminha eventos e redesenha se necessário. Chamar no `loop()`. Roda a ~30 FPS (intervalo de 33ms entre frames).
 
-#### `void addButton(Button* button)`
+#### `void setButtonUp(App::Button* btn)`
 
-Registra um botão para ser consultado a cada `update()`. Máximo de 4 botões. Ignora silenciosamente se o limite foi atingido ou se o ponteiro é `nullptr`.
+Registra o botão de navegação para cima.
+
+#### `void setButtonDown(App::Button* btn)`
+
+Registra o botão de navegação para baixo.
+
+#### `void setButtonSelect(App::Button* btn)`
+
+Registra o botão de seleção/confirmação.
 
 #### `Router& getRouter()`
 
 Retorna referência ao Router interno para navegação de telas.
+
+#### `MidiActivityComponent& getMidiActivity()`
+
+Retorna referência ao indicador de atividade MIDI (renderizado automaticamente em todas as telas).
 
 **Exemplo:**
 
@@ -378,18 +445,24 @@ Retorna referência ao Router interno para navegação de telas.
 #include "button/Button.h"
 
 OledApp app;
-Button botao(8, true);
+App::Button btnUp(11, true);
+App::Button btnDown(12, true);
+App::Button btnSelect(13, true);
 
 void setup() {
     if (!app.begin(0x3C)) {
         Serial.println("Falha no display!");
     }
-    botao.begin();
-    app.addButton(&botao);
+    btnUp.begin();
+    btnDown.begin();
+    btnSelect.begin();
+    app.setButtonUp(&btnUp);
+    app.setButtonDown(&btnDown);
+    app.setButtonSelect(&btnSelect);
 }
 
 void loop() {
-    app.update();  // Faz tudo: lê botões, processa eventos, redesenha
+    app.update();  // Lê botões, processa eventos, redesenha
 }
 ```
 
@@ -421,9 +494,9 @@ Substitui toda a pilha por uma única tela. Útil para "resetar" a navegação.
 
 Retorna ponteiro para a tela ativa (topo da pilha), ou `nullptr` se a pilha está vazia.
 
-#### `void handleInput(ButtonEvent event)`
+#### `void handleInput(NavInput input)`
 
-Encaminha o evento de botão para a tela ativa.
+Encaminha o evento de navegação para a tela ativa.
 
 **Exemplo — Navegação entre telas:**
 
@@ -434,41 +507,41 @@ Encaminha o evento de botão para a tela ativa.
 
 class TelaInicial : public Screen {
 public:
-    TelaInicial(Router* router)
-        : _router(router)
+    TelaInicial(OledApp* app)
+        : _app(app)
         , _texto(0, 20, "Tela Inicial", 2)
     {
         addChild(&_texto);
     }
 
-    void handleInput(ButtonEvent event) override {
-        if (event == ButtonEvent::SINGLE_CLICK) {
-            _router->push(&telaConfig);  // Navega para config
+    void handleInput(NavInput input) override {
+        if (input == NavInput::SELECT) {
+            _app->getRouter().push(&telaConfig);
         }
     }
 
 private:
-    Router* _router;
+    OledApp* _app;
     TextComponent _texto;
 };
 
 class TelaConfig : public Screen {
 public:
-    TelaConfig(Router* router)
-        : _router(router)
+    TelaConfig(OledApp* app)
+        : _app(app)
         , _texto(0, 20, "Configuracoes", 2)
     {
         addChild(&_texto);
     }
 
-    void handleInput(ButtonEvent event) override {
-        if (event == ButtonEvent::LONG_PRESS) {
-            _router->pop();  // Volta para a tela anterior
+    void handleInput(NavInput input) override {
+        if (input == NavInput::SELECT) {
+            _app->getRouter().pop();  // Volta para a tela anterior
         }
     }
 
 private:
-    Router* _router;
+    OledApp* _app;
     TextComponent _texto;
 };
 ```
@@ -497,17 +570,13 @@ Chamado pelo Router ao sair da tela. Sobrescreva para liberar recursos.
 
 Desenha a tela. A implementação base itera sobre os filhos e chama `render()` de cada um. Sobrescreva para lógica customizada.
 
-#### `virtual void handleInput(ButtonEvent event)`
+#### `virtual void handleInput(NavInput input)`
 
-Processa um evento de botão. Sobrescreva para reagir a interações.
+Processa um evento de navegação. Sobrescreva para reagir a interações.
 
-#### `bool addChild(UIComponent* child)`
+#### `void addChild(UIComponent* child)`
 
-Adiciona um componente filho à lista de renderização. Máximo de 16 filhos. Retorna `true` se adicionado.
-
-#### `uint8_t getChildCount() const`
-
-Retorna o número de filhos registrados.
+Adiciona um componente filho à lista de renderização. Máximo de 8 filhos. Ignora silenciosamente se o limite foi atingido.
 
 #### `void markDirty()`
 
@@ -542,8 +611,8 @@ public:
         Serial.println("Tela desmontada!");
     }
 
-    void handleInput(ButtonEvent event) override {
-        if (event == ButtonEvent::PRESSED) {
+    void handleInput(NavInput input) override {
+        if (input == NavInput::SELECT) {
             _info.setText("Botao pressionado!");
             markDirty();  // Solicita redesenho
         }
@@ -595,8 +664,8 @@ public:
         addChild(&_texto);
     }
 
-    void handleInput(ButtonEvent event) override {
-        if (event == ButtonEvent::SINGLE_CLICK) {
+    void handleInput(NavInput input) override {
+        if (input == NavInput::UP) {
             _contador.set(_contador.get() + 1);
             // markDirty() é chamado automaticamente pelo State!
 
@@ -837,13 +906,226 @@ barra.setValue((volume.valor * 100) / 127);  // Converte 0-127 para 0-100
 
 ---
 
+### MidiActivityComponent
+
+Componente visual que indica atividade MIDI. Exibe um pequeno indicador no canto superior direito do display quando uma mensagem MIDI é enviada.
+
+**Incluir:**
+
+```cpp
+#include "ui/components/MidiActivityComponent.h"
+```
+
+#### Construtor
+
+```cpp
+MidiActivityComponent(int16_t x, int16_t y, uint8_t size)
+```
+
+#### `void trigger()`
+
+Ativa o indicador visual. Chamado automaticamente pelo callback `onActivity` do MidiEngine.
+
+#### `bool isActive() const`
+
+Retorna `true` se o indicador está visível (dentro da janela de tempo).
+
+O `OledApp` renderiza este componente automaticamente em todas as telas.
+
+---
+
+## Módulo Storage
+
+Arquivo: `src/storage/Storage.h`, `src/storage/Storage.cpp`
+
+Persistência de configurações na flash do ESP32 via NVS (Non-Volatile Storage). Sobrevive a reinicializações.
+
+#### `void begin()`
+
+Inicializa o NVS e carrega configurações salvas. Chamar no `setup()`.
+
+#### Configurações locais
+
+| Método | Descrição |
+|--------|-----------|
+| `getCanalMidi()` / `setCanalMidi(canal)` | Canal MIDI (1-16) |
+| `getOitava()` / `setOitava(oitava)` | Oitava do teclado (0-8) |
+| `getVelocidade()` / `setVelocidade(vel)` | Velocidade das notas (0-127) |
+| `isTecladoHabilitado()` / `setTecladoHabilitado(hab)` | Teclado on/off |
+| `getControladorCC(indice)` / `setControladorCC(indice, cc)` | CC de cada controle local |
+| `isControleHabilitado(indice)` / `setControleHabilitado(indice, hab)` | Habilitar/desabilitar controle local |
+
+#### `void factoryReset()`
+
+Restaura todas as configurações para os valores padrão de fábrica. Limpa o NVS e recarrega defaults do HardwareMap. Canal volta para 1, oitava para 4, velocidade para 100, todos os controles habilitados com CC padrão.
+
+```cpp
+_storage->factoryReset();  // Tudo volta ao padrão
+```
+
+#### Configurações remotas (módulos I2C)
+
+| Método | Descrição |
+|--------|-----------|
+| `getRemoteCC(addr, idx)` / `setRemoteCC(addr, idx, cc)` | CC de controle remoto |
+| `isRemoteEnabled(addr, idx)` / `setRemoteEnabled(addr, idx, hab)` | Habilitar/desabilitar controle remoto |
+| `loadRemoteConfig(addr, idx, cc, enabled)` | Carrega config salva de módulo redescoberto |
+
+Chaves NVS para remotos: `rccAAII` (CC) e `renAAII` (habilitado), onde AA = endereço hex, II = índice hex.
+
+---
+
+## Módulo Hardware
+
+Arquivos: `src/hardware/CCActivityInfo.h`, `src/hardware/ControlReader.h/.cpp`, `src/hardware/HardwareMap.h`, `src/hardware/UnifiedControlList.h/.cpp`
+
+### CCActivityInfo
+
+Struct com dados completos do último CC enviado. Usada para feedback visual na PerformanceScreen.
+
+**Incluir:**
+
+```cpp
+#include "hardware/CCActivityInfo.h"
+```
+
+**Campos:**
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `label` | `const char*` | Nome do controle (ex: "Pot Volume", "Pot1") |
+| `cc` | `uint8_t` | Número do CC enviado (0-127) |
+| `valor` | `uint8_t` | Valor do CC (0-127) |
+| `canal` | `uint8_t` | Canal MIDI (1-16) |
+| `isRemoto` | `bool` | `true` se vem de módulo externo |
+| `moduleAddress` | `uint8_t` | Endereço I2C (só para remotos, ex: 0x20) |
+
+**Callback:**
+
+```cpp
+using CCActivityCallback = void (*)(const CCActivityInfo& info);
+```
+
+### ControlReader
+
+Leitura automática de controles analógicos (potenciômetros e sensores). Lê GPIOs, converte para 0-127, aplica zona morta e envia CC via MidiEngine.
+
+**Incluir:**
+
+```cpp
+#include "hardware/ControlReader.h"
+```
+
+| Constante | Valor | Descrição |
+|-----------|-------|-----------|
+| `ZONA_MORTA` | 1 | Diferença mínima para enviar CC |
+| `INTERVALO_MS` | 10 | Intervalo entre leituras (ms) |
+
+#### `void begin()`
+
+Inicializa pinos analógicos. Chamar no `setup()`.
+
+#### `void update()`
+
+Lê todos os controles e envia CC se necessário. Chamar no `loop()`.
+
+#### `void onCCActivity(CCActivityCallback callback)`
+
+Registra callback chamado a cada envio de CC com dados completos do controle. Usado para alimentar o monitor de CC na PerformanceScreen.
+
+```cpp
+void onCCActivity(const CCActivityInfo& info) {
+    perfScreen->atualizarCCInfo(info);
+}
+
+controlReader->onCCActivity(onCCActivity);
+```
+
+---
+
+## Módulo I2C
+
+Arquivos: `src/i2c/`
+
+### I2CBus
+
+Interface abstrata para comunicação I2C. Implementações: `WireI2CBus` (hardware real) e `MockI2CBus` (testes).
+
+| Método | Descrição |
+|--------|-----------|
+| `probe(address)` | Verifica se há dispositivo no endereço |
+| `write(address, data, length)` | Envia dados para o dispositivo |
+| `requestFrom(address, buffer, length)` | Solicita dados do dispositivo |
+
+### I2CScanner
+
+Descobre e gerencia módulos externos no barramento I2C (endereços 0x20-0x27).
+
+| Constante | Valor | Descrição |
+|-----------|-------|-----------|
+| `MAX_MODULES` | 8 | Máximo de módulos simultâneos |
+| `MAX_FAIL_COUNT` | 3 | Falhas consecutivas para desconexão |
+| `RESCAN_INTERVAL_MS` | 5000 | Intervalo entre rescans (ms) |
+
+| Método | Descrição |
+|--------|-----------|
+| `scan()` | Varredura completa do barramento |
+| `periodicScan()` | Rescan periódico (chamar no loop) |
+| `readValues(moduleIndex, values, maxLen)` | Lê valores atuais dos controles de um módulo |
+| `getModuleCount()` | Número de módulos conectados |
+| `getModule(index)` | Informações de um módulo (ModuleInfo) |
+
+### ModuleDescriptor
+
+Protocolo binário para comunicação com módulos escravos.
+
+| Comando | Código | Descrição |
+|---------|--------|-----------|
+| `CMD_DESCRIPTOR` | `0x01` | Solicita descritor do módulo |
+| `CMD_READ_VALUES` | `0x02` | Solicita valores dos controles |
+
+Formato do descritor: `[numControles:1][tipo:1][label:12][valor:1] × N`
+
+### UnifiedControlList
+
+Fachada que combina controles locais (HardwareMap) e remotos (I2CScanner) numa lista unificada. Índices 0..N-1 = locais, N..M = remotos. Máximo de 32 controles.
+
+| Método | Descrição |
+|--------|-----------|
+| `rebuild()` | Reconstrói a lista a partir do HardwareMap + módulos |
+| `getNumControles()` | Total de controles (locais + remotos) |
+| `getNumLocais()` | Número de controles locais |
+| `isRemoto(index)` | Verifica se o controle é remoto |
+| `getRemoteInfo(index, addr, ctrlIdx)` | Endereço I2C e índice no módulo |
+
+---
+
+## Telas
+
+Todas as telas herdam de `Screen` e seguem o padrão: `onMount()` inicializa, `render()` desenha, `handleInput(NavInput)` processa navegação.
+
+| Tela | Arquivo | Descrição |
+|------|---------|-----------|
+| `MenuScreen` | `screens/MenuScreen` | Menu principal com status no rodapé (Ch, Oit, Vel) |
+| `PerformanceScreen` | `screens/PerformanceScreen` | Monitor CC em tempo real (label, valor, módulo) + ajuste de oitava |
+| `ConfigScreen` | `screens/ConfigScreen` | Menu de configurações (CC Map, Canal, Oitava, Velocidade, Restaurar) |
+| `CCMapScreen` | `screens/CCMapScreen` | Mapear CC para cada controle (local e remoto), com aceleração |
+| `CanalScreen` | `screens/CanalScreen` | Selecionar canal MIDI (1-16), com aceleração |
+| `OitavaScreen` | `screens/OitavaScreen` | Selecionar oitava (0-8), com aceleração |
+| `VelocidadeScreen` | `screens/VelocidadeScreen` | Selecionar velocidade MIDI (1-127), com aceleração |
+| `TecladoScreen` | `screens/TecladoScreen` | Habilitar/desabilitar teclado (ON/OFF) — escondida do menu |
+| `SobreScreen` | `screens/SobreScreen` | Versão, canal MIDI, número de controles |
+
+---
+
 ## Exemplo Completo
 
-Um controlador MIDI com display OLED, botão, notas e CC:
+Um controlador MIDI com display OLED, 3 botões de navegação, notas e CC:
 
 ```cpp
 #include "midi/MidiEngine.h"
 #include "midi/MidiCC.h"
+#include "midi/MidiNote.h"
 #include "config.h"
 #include "button/Button.h"
 #include "ui/OledApp.h"
@@ -851,10 +1133,11 @@ Um controlador MIDI com display OLED, botão, notas e CC:
 #include "ui/components/TextComponent.h"
 #include "ui/components/ProgressBarComponent.h"
 
-#define BUTTON_PIN 8
 MidiEngine engine;
 OledApp app;
-Button botao(BUTTON_PIN, true);
+App::Button btnUp(11, true);
+App::Button btnDown(12, true);
+App::Button btnSelect(13, true);
 
 class HomeScreen : public Screen {
 public:
@@ -869,21 +1152,8 @@ public:
         addChild(&_barra);
     }
 
-    void handleInput(ButtonEvent event) override {
-        if (event == ButtonEvent::PRESSED) {
-            // Toca nota Dó
-            MidiNote nota(MIDI_Notes::C(4));
-            engine.sendNoteOn(nota);
-            _status.setText("Nota ON");
-            markDirty();
-        }
-        else if (event == ButtonEvent::RELEASED) {
-            MidiNote nota(MIDI_Notes::C(4));
-            engine.sendNoteOff(nota);
-            _status.setText("Pronto");
-            markDirty();
-        }
-        else if (event == ButtonEvent::SINGLE_CLICK) {
+    void handleInput(NavInput input) override {
+        if (input == NavInput::UP) {
             // Incrementa modulação
             _ccValor = (_ccValor + 16 > 127) ? 127 : _ccValor + 16;
             MidiCC modulacao(1, _ccValor);
@@ -891,12 +1161,19 @@ public:
             _barra.setValue((_ccValor * 100) / 127);
             markDirty();
         }
-        else if (event == ButtonEvent::DOUBLE_CLICK) {
-            // Reseta modulação
-            _ccValor = 0;
-            MidiCC modulacao(1, 0);
+        else if (input == NavInput::DOWN) {
+            // Decrementa modulação
+            _ccValor = (_ccValor < 16) ? 0 : _ccValor - 16;
+            MidiCC modulacao(1, _ccValor);
             engine.sendCC(modulacao);
-            _barra.setValue(0);
+            _barra.setValue((_ccValor * 100) / 127);
+            markDirty();
+        }
+        else if (input == NavInput::SELECT) {
+            // Toca nota Dó por 200ms
+            MidiNote nota(MIDI_Notes::C(4));
+            engine.sendNoteOnOff(nota, 200);
+            _status.setText("Nota!");
             markDirty();
         }
     }
@@ -918,8 +1195,12 @@ void setup() {
         Serial.println("Falha no display!");
     }
 
-    botao.begin();
-    app.addButton(&botao);
+    btnUp.begin();
+    btnDown.begin();
+    btnSelect.begin();
+    app.setButtonUp(&btnUp);
+    app.setButtonDown(&btnDown);
+    app.setButtonSelect(&btnSelect);
     app.getRouter().push(&homeScreen);
 }
 

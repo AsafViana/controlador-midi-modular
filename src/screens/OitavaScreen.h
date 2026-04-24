@@ -7,9 +7,14 @@
 
 class OledApp;
 
-class CanalScreen : public Screen {
+/**
+ * OitavaScreen — Tela para configurar a oitava do teclado (0-8).
+ *
+ * UP incrementa, DOWN decrementa, SELECT confirma e volta.
+ */
+class OitavaScreen : public Screen {
 public:
-  CanalScreen(Storage *storage);
+  OitavaScreen(Storage *storage);
 
   void setApp(OledApp *app);
 
@@ -23,6 +28,6 @@ private:
   TextComponent _titulo;
   TextComponent _voltar;
   TextComponent _valorComp;
-  uint8_t _canal = 1;
+  uint8_t _oitava = 4;
   char _buf[4];
 };
