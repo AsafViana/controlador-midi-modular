@@ -50,6 +50,35 @@ void onMidiActivity() {
 void onCCActivity(const CCActivityInfo &info) {
   if (perfScreen)
     perfScreen->atualizarCCInfo(info);
+
+  // MIDI Learn: se CCMapScreen estiver ativa, notificar controle movido
+  if (ccMapScreen && app && app->getRouter().currentScreen() == ccMapScreen) {
+    // Resolver índice unificado
+    if (ucl) {
+      uint8_t total = ucl->getNumControles();
+      uint8_t numLocais = ucl->getNumLocais();
+      if (!info.isRemoto) {
+        // Controle local: buscar pelo label
+        for (uint8_t i = 0; i < numLocais; i++) {
+          if (ucl->getLabel(i) == info.label) {
+            ccMapScreen->notifyControlMoved(i);
+            break;
+          }
+        }
+      } else {
+        // Controle remoto: buscar por endereço
+        for (uint8_t i = numLocais; i < total; i++) {
+          uint8_t addr, ctrlIdx;
+          if (ucl->getRemoteInfo(i, addr, ctrlIdx) &&
+              addr == info.moduleAddress &&
+              ucl->getLabel(i) == info.label) {
+            ccMapScreen->notifyControlMoved(i);
+            break;
+          }
+        }
+      }
+    }
+  }
 }
 
 void setup() {

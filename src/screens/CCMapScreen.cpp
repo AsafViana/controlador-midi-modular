@@ -92,12 +92,31 @@ void CCMapScreen::setHabilitado(uint8_t idx, bool habilitado) {
 
 void CCMapScreen::onMount() {
   _indice = 0;
-  _modo = ModoEdicao::NENHUM;
+  _modo = ModoEdicao::AGUARDANDO_CONTROLE;
+  markDirty();
+}
+
+void CCMapScreen::notifyControlMoved(uint8_t unifiedIndex) {
+  if (_modo != ModoEdicao::AGUARDANDO_CONTROLE)
+    return;
+  if (unifiedIndex >= getTotalControles())
+    return;
+  _indice = unifiedIndex;
+  _ccTemp = getCC(_indice);
+  _modo = ModoEdicao::EDITAR_CC;
   markDirty();
 }
 
 void CCMapScreen::handleInput(NavInput input) {
   const uint8_t total = getTotalControles();
+
+  if (_modo == ModoEdicao::AGUARDANDO_CONTROLE) {
+    // SELECT cancela e volta
+    if (input == NavInput::SELECT && _app) {
+      _app->getRouter().pop();
+    }
+    return;
+  }
 
   if (_modo == ModoEdicao::NENHUM) {
     switch (input) {
@@ -185,7 +204,13 @@ void CCMapScreen::render(Adafruit_SSD1306 &display) {
   const uint8_t total = getTotalControles();
   char labelBuf[24];
 
-  if (_modo == ModoEdicao::EDITAR_CC) {
+  if (_modo == ModoEdicao::AGUARDANDO_CONTROLE) {
+    display.setCursor(0, CONTENT_Y + 8);
+    display.print("Mova um controle...");
+    display.setCursor(0, CONTENT_Y + 28);
+    display.print("SELECT = Cancelar");
+
+  } else if (_modo == ModoEdicao::EDITAR_CC) {
     display.setCursor(0, CONTENT_Y);
     display.print("Editando CC:");
     display.setTextSize(2);

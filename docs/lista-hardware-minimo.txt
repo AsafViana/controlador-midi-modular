@@ -1,0 +1,86 @@
+🎛️ *HARDWARE MÍNIMO - Controlador MIDI Modular*
+
+Pra testar todas as funcionalidades do sistema, incluindo comunicação entre módulos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 *MÓDULO PRINCIPAL (obrigatório)*
+
+• 1x ESP32-S3-DevKitC-1 (N16R8) — cérebro do sistema
+• 1x Display OLED SSD1306 128x64 I2C — tela de interface
+• 3x Botão táctil (push button) — navegação UP/DOWN/SELECT
+• 4x Potenciômetro 10kΩ linear — controles MIDI (Volume, Pan, Modulação, Extra)
+• 1x LDR + 1x resistor 10kΩ — sensor de luz
+• 1x Cabo USB-C — alimentação + USB MIDI
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎵 *MIDI DIN (opcional)*
+
+Se quiser testar saída MIDI por cabo DIN (5 pinos):
+
+• 1-2x Conector DIN 5 pinos (fêmea)
+• 1x Optoacoplador 6N138
+• 2x Resistores (220Ω e 470Ω)
+• 1x Diodo 1N4148
+
+⚠️ O MIDI USB já funciona só com o cabo USB-C, então pode pular isso no início.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 *MÓDULO REMOTO I2C (pra testar comunicação entre módulos)*
+
+• 1x Arduino Nano ou ATtiny85 — módulo escravo I2C
+• 1-2x Potenciômetros no módulo remoto
+• 2x Resistores 4.7kΩ — pull-ups pro barramento I2C
+
+O módulo escravo responde nos endereços 0x20 a 0x27 com dois comandos:
+  → 0x01 = envia descritor (nome e tipo dos controles)
+  → 0x02 = envia valores atuais (0-127)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛒 *LISTA DE COMPRAS RESUMIDA*
+
+1x ESP32-S3-DevKitC-1 ........... ~R$45
+1x Display OLED 0.96" ........... ~R$15
+3x Push buttons ................. ~R$2
+2x Potenciômetros 10kΩ .......... ~R$3
+   (2 já validam a leitura, os outros pinos ficam livres)
+1x LDR + resistor 10kΩ .......... ~R$2
+1x Arduino Nano (módulo remoto) .. ~R$15-25
+1x Protoboard + jumpers ......... ~R$15
+2x Resistores 4.7kΩ ............. ~R$1
+
+💰 *Total estimado: ~R$100-110*
+   Sem módulo remoto: ~R$80
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 *PINAGEM DO ESP32-S3*
+
+GPIO 1 → Pot Volume
+GPIO 2 → Pot Pan
+GPIO 3 → Pot Modulação
+GPIO 5 → I2C SDA (display + módulos)
+GPIO 4 → I2C SCL (display + módulos)
+GPIO 6 → Sensor Luz (LDR)
+GPIO 7 → Pot Extra
+GPIO 9 → MIDI TX (DIN OUT)
+GPIO 10 → MIDI RX (DIN IN)
+GPIO 11 → Botão UP
+GPIO 12 → Botão DOWN
+GPIO 13 → Botão SELECT
+GPIO 0 → LED indicador
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Com isso dá pra testar:
+• Leitura de potenciômetros e sensor
+• Navegação por menus no display
+• Envio de MIDI CC via USB
+• Envio de MIDI CC via DIN (se montar o circuito)
+• Comunicação I2C com módulo remoto
+• Descoberta automática de módulos
+• Mapeamento de CC pelo menu
+• Factory reset

@@ -18,6 +18,10 @@ public:
     void onMount() override;
     void render(Adafruit_SSD1306& display) override;
 
+    /// Chamado externamente quando um controle se move (MIDI Learn).
+    /// Só age se estiver no modo AGUARDANDO_CONTROLE.
+    void notifyControlMoved(uint8_t unifiedIndex);
+
 private:
     Storage* _storage;
     OledApp* _app = nullptr;
@@ -28,11 +32,12 @@ private:
     uint8_t _indice = 0;
 
     enum class ModoEdicao : uint8_t {
+        AGUARDANDO_CONTROLE,
         NENHUM,
         EDITAR_CC,
         EDITAR_ONOFF
     };
-    ModoEdicao _modo = ModoEdicao::NENHUM;
+    ModoEdicao _modo = ModoEdicao::AGUARDANDO_CONTROLE;
 
     uint8_t _ccTemp   = 0;
     bool    _onOffTemp = true;
