@@ -3,17 +3,25 @@
 #include "hardware/HardwareMap.h"
 #include <cstdint>
 
-
 /**
  * Módulo de armazenamento persistente (NVS).
  *
  * Salva configurações na flash do ESP32 que sobrevivem a
  * reinicializações. O número de controles e seus defaults
  * vêm do HardwareMap.
+ *
+ * Schema version: sempre que NUM_CONTROLES mudar, o boot detecta
+ * a versão desatualizada na NVS e executa factoryReset() automático,
+ * evitando CCs errados herdados de arrays antigos.
  */
 class Storage {
 public:
   static constexpr uint8_t MAX_CONTROLES = HardwareMap::NUM_CONTROLES;
+
+  // Versão do schema NVS — muda automaticamente com NUM_CONTROLES.
+  // Se quiser forçar um reset por outra razão, incremente o +1.
+  static constexpr uint8_t NVS_SCHEMA_VERSION =
+      HardwareMap::NUM_CONTROLES + 1;
 
   void begin();
 
@@ -42,17 +50,12 @@ public:
   void setVelocidade(uint8_t vel);
 
   // ── Controles Remotos ────────────────────────────────
-  /// Retorna o CC configurado para um controle remoto.
-  /// Chave: endereço I2C + índice do controle.
   uint8_t getRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t cc);
 
-  /// Retorna se um controle remoto está habilitado.
   bool isRemoteEnabled(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteEnabled(uint8_t i2cAddr, uint8_t ctrlIdx, bool enabled);
 
-  /// Carrega configurações salvas para um módulo redescoberto.
-  /// Retorna true se havia configurações salvas.
   bool loadRemoteConfig(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t &cc,
                         bool &enabled) const;
 
@@ -68,17 +71,13 @@ private:
   bool _ccHabilitado[HardwareMap::NUM_CONTROLES];
   bool _tecladoHabilitado = true;
 
-  // ── Cache de configurações remotas ───────────────────
   struct RemoteCCConfig {
     uint8_t cc;
     bool enabled;
-    bool hasData; // true se foi carregado do NVS ou configurado
+    bool hasData;
   };
 
-  // Cache: 8 endereços (0x20-0x27) × 16 controles = 128 entradas
   RemoteCCConfig _remoteConfig[8][16];
 
-  /// Converte endereço I2C (0x20-0x27) para índice do array (0-7).
-  /// Retorna 0xFF se o endereço estiver fora do intervalo.
   uint8_t addrToIndex(uint8_t i2cAddr) const;
 };
