@@ -26,7 +26,14 @@ class I2CScanner;
 class ControlReader {
 public:
   /// Zona morta: só envia CC se a diferença for maior que este valor.
-  static constexpr uint8_t ZONA_MORTA = 1;
+  static constexpr uint8_t ZONA_MORTA = 2;
+
+  /// Limites de calibração do ADC (zona morta física do potenciômetro).
+  static constexpr uint16_t ADC_MIN = 100;
+  static constexpr uint16_t ADC_MAX = 3900;
+
+  /// Fator de suavização do filtro EMA (0 = sem filtro, 1 = sem memória).
+  static constexpr float EMA_ALPHA = 0.15f;
 
   /// Intervalo mínimo entre leituras (ms).
   static constexpr uint32_t INTERVALO_MS = 10;
@@ -64,6 +71,10 @@ private:
   uint8_t _ultimoValor[HardwareMap::NUM_CONTROLES];
   uint8_t _ultimoValorRemoto[MAX_REMOTE_CONTROLS];
   uint32_t _ultimaLeitura = 0;
+
+  /// Estado do filtro EMA por controle.
+  float _emaValue[HardwareMap::NUM_CONTROLES];
+  bool _emaInitialized[HardwareMap::NUM_CONTROLES];
 
   CCActivityCallback _ccActivityCallback = nullptr;
 

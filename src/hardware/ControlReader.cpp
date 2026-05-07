@@ -4,7 +4,6 @@
 #include "midi/MidiEngine.h"
 #include "storage/Storage.h"
 
-
 #ifdef ARDUINO
 #include <Arduino.h>
 #else
@@ -16,6 +15,8 @@ ControlReader::ControlReader(MidiEngine *engine, Storage *storage,
     : _engine(engine), _storage(storage), _ucl(ucl), _scanner(scanner) {
   for (uint8_t i = 0; i < HardwareMap::NUM_CONTROLES; i++) {
     _ultimoValor[i] = 255; // Valor impossível para forçar primeiro envio
+    _emaInitialized[i] = false;
+    _emaValue[i] = 0.0f;
   }
   for (uint8_t i = 0; i < MAX_REMOTE_CONTROLS; i++) {
     _ultimoValorRemoto[i] = 255;
@@ -41,8 +42,26 @@ void ControlReader::onCCActivity(CCActivityCallback callback) {
 uint8_t ControlReader::lerControle(uint8_t indice) {
   int leitura = analogRead(HardwareMap::getGpio(indice));
 
-  // Converte 0-4095 para 0-127
-  uint8_t valor = leitura / 32;
+  // Filtro EMA — suaviza ruído do ADC
+  if (!_emaInitialized[indice]) {
+    _emaValue[indice] = static_cast<float>(leitura);
+    _emaInitialized[indice] = true;
+  } else {
+    _emaValue[indice] = EMA_ALPHA * static_cast<float>(leitura) +
+                        (1.0f - EMA_ALPHA) * _emaValue[indice];
+  }
+
+  // Clamp ao range calibrado [ADC_MIN, ADC_MAX]
+  float filtered = _emaValue[indice];
+  if (filtered < static_cast<float>(ADC_MIN))
+    filtered = static_cast<float>(ADC_MIN);
+  if (filtered > static_cast<float>(ADC_MAX))
+    filtered = static_cast<float>(ADC_MAX);
+
+  // Mapeamento linear calibrado para 0-127
+  uint8_t valor =
+      static_cast<uint8_t>((filtered - static_cast<float>(ADC_MIN)) * 127.0f /
+                           static_cast<float>(ADC_MAX - ADC_MIN));
   if (valor > 127)
     valor = 127;
 
