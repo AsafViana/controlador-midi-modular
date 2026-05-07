@@ -67,11 +67,6 @@ constexpr uint8_t CC_AUTO_POOL_SIZE =
 // ── Controles MIDI endereçáveis a CC ─────────────────
 // GPIOs 1, 2, 3, 6, 7, 8 estão livres para potenciômetros
 constexpr ControleHW CONTROLES[] = {
-    // label            gpio  tipo                          ccPadrao  invertido
-    {"Pot Volume", 1, TipoControle::POTENCIOMETRO, 7, false},
-    {"Pot Pan", 2, TipoControle::POTENCIOMETRO, 10, false},
-    {"Pot Modulacao", 3, TipoControle::POTENCIOMETRO, 1, false},
-    {"Sensor Luz", 6, TipoControle::SENSOR, 11, true},
     {"Pot Extra", 7, TipoControle::POTENCIOMETRO, 0, false}, // CC auto
 };
 
