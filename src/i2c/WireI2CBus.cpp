@@ -3,10 +3,14 @@
 #ifdef ARDUINO
 
 #include <Wire.h>
+#include "hardware/HardwareMap.h"
 
 void WireI2CBus::begin() {
-    // ESP32-S3: SDA=pino 1, SCL=pino 2 (conforme pinagem DB-9)
-    Wire.begin(1, 2);
+    // Pinos definidos no HardwareMap: SDA=5, SCL=4
+    // Wire.begin() deve ser chamado UMA única vez em todo o sistema.
+    // OledApp::begin() NÃO deve chamar Wire.begin() — ele reutiliza
+    // o barramento já inicializado aqui.
+    Wire.begin(HardwareMap::PIN_I2C_SDA, HardwareMap::PIN_I2C_SCL);
 }
 
 bool WireI2CBus::probe(uint8_t address) {
@@ -34,23 +38,14 @@ uint8_t WireI2CBus::requestFrom(uint8_t address, uint8_t* buffer,
 }
 
 #else
-// ── Native build stubs — safe no-ops ────────────────────
 
-void WireI2CBus::begin() {
-    // No-op in native builds
-}
+void WireI2CBus::begin() {}
 
-bool WireI2CBus::probe(uint8_t /*address*/) {
-    return false;
-}
+bool WireI2CBus::probe(uint8_t /*address*/) { return false; }
 
-bool WireI2CBus::write(uint8_t /*address*/, const uint8_t* /*data*/, uint8_t /*length*/) {
-    return false;
-}
+bool WireI2CBus::write(uint8_t /*address*/, const uint8_t* /*data*/, uint8_t /*length*/) { return false; }
 
 uint8_t WireI2CBus::requestFrom(uint8_t /*address*/, uint8_t* /*buffer*/,
-                                 uint8_t /*length*/, uint32_t /*timeoutMs*/) {
-    return 0;
-}
+                                 uint8_t /*length*/, uint32_t /*timeoutMs*/) { return 0; }
 
 #endif
