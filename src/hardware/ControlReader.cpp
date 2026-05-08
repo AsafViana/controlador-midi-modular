@@ -31,6 +31,8 @@ void ControlReader::begin() {
   for (uint8_t i = 0; i < HardwareMap::NUM_CONTROLES; i++) {
     if (HardwareMap::isAnalogico(i)) {
       pinMode(HardwareMap::getGpio(i), INPUT);
+    } else if (HardwareMap::isBotaoMidi(i)) {
+      pinMode(HardwareMap::getGpio(i), INPUT_PULLUP);
     }
   }
 #endif
@@ -127,6 +129,9 @@ void ControlReader::update() {
     }
   }
 
+  // ── Botões MIDI ──────────────────────────────────────────────────────────
+  processarBotoesMidi(canal);
+
   // ── Controles remotos ────────────────────────────────────────────────────
   if (_ucl == nullptr || _scanner == nullptr)
     return;
@@ -195,6 +200,59 @@ void ControlReader::update() {
         }
 
         break;
+      }
+    }
+  }
+}
+
+void ControlReader::processarBotoesMidi(uint8_t canal) {
+  uint32_t now = millis();
+
+  for (uint8_t i = 0; i < HardwareMap::NUM_CONTROLES; i++) {
+    if (!HardwareMap::isBotaoMidi(i))
+      continue;
+
+    // Lê estado do botão (active low com pull-up)
+    bool pressed = (digitalRead(HardwareMap::getGpio(i)) == 0);
+
+    // Debounce
+    if (pressed != _btnMidiState[i].lastState) {
+      if (now - _btnMidiState[i].lastChange < BTN_DEBOUNCE_MS)
+        continue;
+      _btnMidiState[i].lastChange = now;
+      _btnMidiState[i].lastState = pressed;
+
+      uint8_t cc = _storage->getControladorCC(i);
+      uint8_t valor = 0;
+
+      TipoControle tipo = HardwareMap::getTipo(i);
+
+      if (tipo == TipoControle::BOTAO_MIDI_MOMENTANEO) {
+        // Momentâneo: press=127, release=0
+        valor = pressed ? 127 : 0;
+        MidiCC msg(cc, valor, canal);
+        _engine->sendCC(msg);
+      } else if (tipo == TipoControle::BOTAO_MIDI_TOGGLE) {
+        // Toggle: alterna a cada press (ignora release)
+        if (pressed) {
+          _btnMidiState[i].toggleValue = !_btnMidiState[i].toggleValue;
+          valor = _btnMidiState[i].toggleValue ? 127 : 0;
+          MidiCC msg(cc, valor, canal);
+          _engine->sendCC(msg);
+        } else {
+          continue; // Release não envia nada no toggle
+        }
+      }
+
+      if (_ccActivityCallback) {
+        CCActivityInfo info;
+        info.label = HardwareMap::getLabel(i);
+        info.cc = cc;
+        info.valor = valor;
+        info.canal = canal;
+        info.isRemoto = false;
+        info.moduleAddress = 0;
+        _ccActivityCallback(info);
       }
     }
   }

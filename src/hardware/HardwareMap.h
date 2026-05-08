@@ -12,7 +12,14 @@
  * para obter um CC único sem conflitos. Ou defina manualmente se preferir.
  */
 
-enum class TipoControle : uint8_t { BOTAO, POTENCIOMETRO, SENSOR, ENCODER };
+enum class TipoControle : uint8_t {
+  BOTAO,                 // Botão de navegação (não MIDI)
+  POTENCIOMETRO,         // Controle analógico contínuo
+  SENSOR,                // Sensor analógico (ex: luz)
+  ENCODER,               // Encoder rotativo
+  BOTAO_MIDI_MOMENTANEO, // Botão MIDI: press=127, release=0
+  BOTAO_MIDI_TOGGLE      // Botão MIDI: alterna entre 0 e 127
+};
 
 struct ControleHW {
   const char *label;
@@ -96,6 +103,14 @@ inline bool isAnalogico(uint8_t i) {
     return false;
   TipoControle t = CONTROLES[i].tipo;
   return t == TipoControle::POTENCIOMETRO || t == TipoControle::SENSOR;
+}
+
+inline bool isBotaoMidi(uint8_t i) {
+  if (i >= NUM_CONTROLES)
+    return false;
+  TipoControle t = CONTROLES[i].tipo;
+  return t == TipoControle::BOTAO_MIDI_MOMENTANEO ||
+         t == TipoControle::BOTAO_MIDI_TOGGLE;
 }
 
 /**

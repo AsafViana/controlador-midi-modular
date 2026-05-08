@@ -60,7 +60,8 @@ public:
   /**
    * @param engine  Ponteiro para o MidiEngine (envio de CC)
    * @param storage Ponteiro para o Storage (CC map + habilitado)
-   * @param ucl     Ponteiro para a UnifiedControlList (nullptr = modo standalone)
+   * @param ucl     Ponteiro para a UnifiedControlList (nullptr = modo
+   * standalone)
    * @param scanner Ponteiro para o I2CScanner (nullptr = modo standalone)
    */
   ControlReader(MidiEngine *engine, Storage *storage,
@@ -91,6 +92,18 @@ private:
 
   CCActivityCallback _ccActivityCallback = nullptr;
 
+  /// Estado dos botões MIDI (para debounce e toggle)
+  struct MidiButtonState {
+    bool lastState = false;   // último estado lido (após debounce)
+    bool toggleValue = false; // valor atual do toggle (0 ou 127)
+    uint32_t lastChange = 0;  // timestamp da última mudança
+  };
+  MidiButtonState _btnMidiState[HardwareMap::NUM_CONTROLES];
+  static constexpr uint32_t BTN_DEBOUNCE_MS = 50;
+
   /// Lê um controle analógico local e retorna valor 0-127.
   uint8_t lerControle(uint8_t indice);
+
+  /// Processa botões MIDI (momentâneo e toggle).
+  void processarBotoesMidi(uint8_t canal);
 };
