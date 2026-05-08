@@ -85,6 +85,28 @@ void OledApp::setIdleTimeoutSeconds(uint16_t seconds) {
 
 void OledApp::resetIdleTimer() { _lastInputTime = millis(); }
 
+void OledApp::setScreensaverTimes(uint16_t dimSeconds, uint16_t offSeconds) {
+  _dimTimeoutSeconds = dimSeconds;
+  _offTimeoutSeconds = offSeconds;
+}
+
+void OledApp::wakeDisplay() {
+  if (_display == nullptr)
+    return;
+  if (_displayState != DisplayState::ACTIVE) {
+    _displayState = DisplayState::ACTIVE;
+#ifdef ARDUINO
+    _display->ssd1306_command(0x81); // SSD1306_SETCONTRAST
+    _display->ssd1306_command(0xCF); // Contraste padrão (207)
+    _display->ssd1306_command(0xAF); // SSD1306_DISPLAYON
+#endif
+    // Força redesenho
+    Screen *screen = _router.currentScreen();
+    if (screen)
+      screen->markDirty();
+  }
+}
+
 void OledApp::update() {
   if (_display == nullptr)
     return;
@@ -134,6 +156,36 @@ void OledApp::update() {
 
   if (hadInput) {
     _lastInputTime = now;
+    // Se o display estava em screensaver, acorda e consome o evento
+    if (_displayState != DisplayState::ACTIVE) {
+      wakeDisplay();
+      return; // Consome o input — não navega
+    }
+  }
+
+  // ── Screensaver ────────────────────────────────────────────────────────
+  if (_dimTimeoutSeconds > 0 || _offTimeoutSeconds > 0) {
+    uint32_t elapsed = now - _lastInputTime;
+
+    if (_offTimeoutSeconds > 0 &&
+        elapsed >= static_cast<uint32_t>(_offTimeoutSeconds) * 1000UL) {
+      if (_displayState != DisplayState::OFF) {
+        _displayState = DisplayState::OFF;
+#ifdef ARDUINO
+        _display->ssd1306_command(0xAE); // SSD1306_DISPLAYOFF
+#endif
+      }
+      return; // Display desligado — não renderiza
+    } else if (_dimTimeoutSeconds > 0 &&
+               elapsed >= static_cast<uint32_t>(_dimTimeoutSeconds) * 1000UL) {
+      if (_displayState != DisplayState::DIMMED) {
+        _displayState = DisplayState::DIMMED;
+#ifdef ARDUINO
+        _display->ssd1306_command(0x81); // SSD1306_SETCONTRAST
+        _display->ssd1306_command(0x19); // ~10% contraste (25/255)
+#endif
+      }
+    }
   }
 
   // ── Timeout de inatividade ─────────────────────────────────────────────

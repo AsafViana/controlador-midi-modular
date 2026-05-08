@@ -41,6 +41,9 @@ public:
   /// Reseta o timer de inatividade (chamado internamente a cada input)
   void resetIdleTimer();
 
+  /// Define tempos do screensaver em segundos (0 = desligado)
+  void setScreensaverTimes(uint16_t dimSeconds, uint16_t offSeconds);
+
 private:
   Adafruit_SSD1306
       *_display; // instanciado em begin(), nao no construtor global
@@ -64,4 +67,12 @@ private:
   bool _showingSaveOverlay = false;
   uint32_t _saveOverlayStart = 0;
   static constexpr uint32_t SAVE_OVERLAY_DURATION_MS = 800;
+
+  // Screensaver (proteção OLED)
+  enum class DisplayState : uint8_t { ACTIVE, DIMMED, OFF };
+  DisplayState _displayState = DisplayState::ACTIVE;
+  uint16_t _dimTimeoutSeconds = 120; // 2 min para dim
+  uint16_t _offTimeoutSeconds = 300; // 5 min para desligar
+
+  void wakeDisplay();
 };
