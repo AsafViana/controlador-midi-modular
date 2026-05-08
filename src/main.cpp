@@ -17,10 +17,6 @@
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
 
-#ifdef ARDUINO
-#include <Arduino.h>
-#endif
-
 #ifndef FIRMWARE_VERSION
 #define FIRMWARE_VERSION "dev"
 #endif
@@ -43,8 +39,6 @@ static VelocidadeScreen*   velScreen     = nullptr;
 static ConfigScreen*       configScreen  = nullptr;
 static MenuScreen*         menuScreen    = nullptr;
 static SobreScreen*        sobreScreen   = nullptr;
-
-static uint32_t _debugTimer = 0;
 
 void onMidiActivity() {
     if (app) app->getMidiActivity().trigger();
@@ -80,9 +74,11 @@ void onCCActivity(const CCActivityInfo& info) {
 }
 
 void setup() {
+    // [1] USB MIDI — DEVE ser o primeiro, antes de Serial.begin()
     engine = new MidiEngine();
     engine->begin();
 
+    // [2] Serial debug
     Serial.begin(115200);
     delay(500);
     Serial.println("=== BOOT START ===");
@@ -158,19 +154,6 @@ void setup() {
 }
 
 void loop() {
-    // DEBUG: primeiro no loop, antes de qualquer outra coisa
-    // Se isso aparecer no Serial, o loop() esta rodando.
-    // Se nao aparecer, algo no setup() esta travando apos BOOT OK.
-    uint32_t now = millis();
-    if (now - _debugTimer >= 500) {
-        _debugTimer = now;
-        int raw = analogRead(HardwareMap::getGpio(0));
-        Serial.print("LOOP raw=");
-        Serial.print(raw);
-        Serial.print(" CC=");
-        Serial.println(map(constrain(raw, 100, 3900), 100, 3900, 0, 127));
-    }
-
     if (controlReader) controlReader->update();
     if (scanner)       scanner->periodicScan();
     if (ucl && scanner && scanner->needsRebuild()) {

@@ -1,4 +1,5 @@
 #include "screens/MenuScreen.h"
+#include <cstdio>
 #include "config.h"
 #include "screens/ConfigScreen.h"
 #include "screens/PerformanceScreen.h"
