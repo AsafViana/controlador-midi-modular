@@ -54,3 +54,18 @@ void MidiEngine::sendCC(const MidiCC &cc) {
 #endif
   notifyActivity();
 }
+
+void MidiEngine::sendProgramChange(uint8_t program, uint8_t canal) {
+  if (program > 127)
+    program = 127;
+  if (canal < 1)
+    canal = 1;
+  if (canal > 16)
+    canal = 16;
+
+  _midi.sendProgramChange(MIDIAddress(program, Channel(canal)));
+#ifdef ARDUINO
+  _midiDIN.sendProgramChange(MIDIAddress(program, Channel(canal)));
+#endif
+  notifyActivity();
+}

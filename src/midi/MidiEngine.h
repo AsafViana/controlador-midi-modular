@@ -19,6 +19,7 @@ public:
   void sendNoteOff(const MidiNote &note);
   void sendNoteOnOff(const MidiNote &note, uint16_t duracaoMs);
   void sendCC(const MidiCC &cc);
+  void sendProgramChange(uint8_t program, uint8_t canal);
 
   /// Registra callback chamado a cada mensagem MIDI enviada.
   void onActivity(MidiActivityCallback callback);

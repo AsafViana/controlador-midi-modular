@@ -13,6 +13,7 @@
 #include "screens/OitavaScreen.h"
 #include "screens/PerformanceScreen.h"
 #include "screens/PresetScreen.h"
+#include "screens/ProgramChangeScreen.h"
 #include "screens/SobreScreen.h"
 #include "screens/VelocidadeScreen.h"
 #include "storage/PresetManager.h"
@@ -48,6 +49,7 @@ static MenuScreen *menuScreen = nullptr;
 static SobreScreen *sobreScreen = nullptr;
 static PresetManager *presetManager = nullptr;
 static PresetScreen *presetScreen = nullptr;
+static ProgramChangeScreen *progChangeScreen = nullptr;
 
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
@@ -145,9 +147,10 @@ void setup() {
     velScreen = new VelocidadeScreen(storage);
     sobreScreen = new SobreScreen(storage, ucl);
     presetScreen = new PresetScreen(app, storage, presetManager);
+    progChangeScreen = new ProgramChangeScreen(engine, storage);
 
     configScreen = new ConfigScreen(app, storage, ccMapScreen, canalScreen,
-                                    oitavaScreen, velScreen);
+                                    oitavaScreen, velScreen, progChangeScreen);
     menuScreen = new MenuScreen(app, storage, perfScreen, configScreen,
                                 sobreScreen, presetScreen);
 
@@ -157,6 +160,7 @@ void setup() {
     oitavaScreen->setApp(app);
     velScreen->setApp(app);
     sobreScreen->setApp(app);
+    progChangeScreen->setApp(app);
 
     Serial.println("[9] activity");
     engine->onActivity(onMidiActivity);
