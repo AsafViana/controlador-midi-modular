@@ -7,6 +7,7 @@
 #include "i2c/WireI2CBus.h"
 #include "midi/MidiEngine.h"
 #include "screens/CCMapScreen.h"
+#include "screens/CalibracaoScreen.h"
 #include "screens/CanalScreen.h"
 #include "screens/ConfigScreen.h"
 #include "screens/MenuScreen.h"
@@ -50,6 +51,7 @@ static SobreScreen *sobreScreen = nullptr;
 static PresetManager *presetManager = nullptr;
 static PresetScreen *presetScreen = nullptr;
 static ProgramChangeScreen *progChangeScreen = nullptr;
+static CalibracaoScreen *calibracaoScreen = nullptr;
 
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
@@ -162,9 +164,11 @@ void setup() {
     sobreScreen = new SobreScreen(storage, ucl);
     presetScreen = new PresetScreen(app, storage, presetManager);
     progChangeScreen = new ProgramChangeScreen(engine, storage);
+    calibracaoScreen = new CalibracaoScreen(storage);
 
-    configScreen = new ConfigScreen(app, storage, ccMapScreen, canalScreen,
-                                    oitavaScreen, velScreen, progChangeScreen);
+    configScreen =
+        new ConfigScreen(app, storage, ccMapScreen, canalScreen, oitavaScreen,
+                         velScreen, progChangeScreen, calibracaoScreen);
     menuScreen = new MenuScreen(app, storage, perfScreen, configScreen,
                                 sobreScreen, presetScreen);
 
@@ -175,6 +179,7 @@ void setup() {
     velScreen->setApp(app);
     sobreScreen->setApp(app);
     progChangeScreen->setApp(app);
+    calibracaoScreen->setApp(app);
 
     Serial.println("[9] activity");
     engine->onActivity(onMidiActivity);

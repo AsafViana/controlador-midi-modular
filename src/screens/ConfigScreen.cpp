@@ -1,6 +1,7 @@
 #include "screens/ConfigScreen.h"
 #include "config.h"
 #include "screens/CCMapScreen.h"
+#include "screens/CalibracaoScreen.h"
 #include "screens/CanalScreen.h"
 #include "screens/OitavaScreen.h"
 #include "screens/ProgramChangeScreen.h"
@@ -8,17 +9,18 @@
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
 
-const char *ConfigScreen::_opcoes[] = {"Mapa CC",     "Canal MIDI",
-                                       "Oitava",      "Velocidade",
-                                       "Prog Change", "Restaurar"};
+const char *ConfigScreen::_opcoes[] = {"Mapa CC",    "Canal MIDI",  "Oitava",
+                                       "Velocidade", "Prog Change", "Calibrar",
+                                       "Restaurar"};
 
 ConfigScreen::ConfigScreen(OledApp *app, Storage *storage, CCMapScreen *ccMap,
                            CanalScreen *canal, OitavaScreen *oitava,
                            VelocidadeScreen *velocidade,
-                           ProgramChangeScreen *progChange)
+                           ProgramChangeScreen *progChange,
+                           CalibracaoScreen *calibracao)
     : _app(app), _storage(storage), _ccMap(ccMap), _canal(canal),
       _oitava(oitava), _velocidade(velocidade), _progChange(progChange),
-      _titulo(0, 0, "Configuracoes", 1),
+      _calibracao(calibracao), _titulo(0, 0, "Configuracoes", 1),
       _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT, 1),
       _confirmandoReset(false) {
   addChild(&_titulo);
@@ -122,6 +124,10 @@ void ConfigScreen::handleInput(NavInput input) {
         router.push(_progChange);
       break;
     case 5:
+      if (_calibracao)
+        router.push(_calibracao);
+      break;
+    case 6:
       // Factory reset — pede confirmação
       _confirmandoReset = true;
       markDirty();

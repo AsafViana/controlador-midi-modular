@@ -11,13 +11,15 @@ class CanalScreen;
 class OitavaScreen;
 class VelocidadeScreen;
 class ProgramChangeScreen;
+class CalibracaoScreen;
 
 class ConfigScreen : public Screen {
 public:
   ConfigScreen(OledApp *app, Storage *storage, CCMapScreen *ccMap,
                CanalScreen *canal, OitavaScreen *oitava,
                VelocidadeScreen *velocidade,
-               ProgramChangeScreen *progChange = nullptr);
+               ProgramChangeScreen *progChange = nullptr,
+               CalibracaoScreen *calibracao = nullptr);
 
   void handleInput(NavInput input) override;
   bool handleBack() override;
@@ -32,11 +34,12 @@ private:
   OitavaScreen *_oitava;
   VelocidadeScreen *_velocidade;
   ProgramChangeScreen *_progChange;
+  CalibracaoScreen *_calibracao;
   TextComponent _titulo;
   ListComponent _lista;
 
   bool _confirmandoReset = false;
 
   static const char *_opcoes[];
-  static constexpr uint8_t NUM_OPCOES = 6;
+  static constexpr uint8_t NUM_OPCOES = 7;
 };

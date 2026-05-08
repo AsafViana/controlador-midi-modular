@@ -51,14 +51,23 @@ uint8_t ControlReader::lerControle(uint8_t indice) {
   }
 
   float filtered = _emaValue[indice];
-  if (filtered < static_cast<float>(ADC_MIN))
-    filtered = static_cast<float>(ADC_MIN);
-  if (filtered > static_cast<float>(ADC_MAX))
-    filtered = static_cast<float>(ADC_MAX);
+
+  // Usa calibração individual se disponível, senão usa defaults
+  uint16_t adcMin = _storage->hasCalibration(indice)
+                        ? _storage->getCalibMin(indice)
+                        : ADC_MIN;
+  uint16_t adcMax = _storage->hasCalibration(indice)
+                        ? _storage->getCalibMax(indice)
+                        : ADC_MAX;
+
+  if (filtered < static_cast<float>(adcMin))
+    filtered = static_cast<float>(adcMin);
+  if (filtered > static_cast<float>(adcMax))
+    filtered = static_cast<float>(adcMax);
 
   uint8_t valor =
-      static_cast<uint8_t>((filtered - static_cast<float>(ADC_MIN)) * 127.0f /
-                           static_cast<float>(ADC_MAX - ADC_MIN));
+      static_cast<uint8_t>((filtered - static_cast<float>(adcMin)) * 127.0f /
+                           static_cast<float>(adcMax - adcMin));
   if (valor > 127)
     valor = 127;
 
@@ -89,7 +98,8 @@ void ControlReader::update() {
     uint8_t ultimo = _ultimoValor[i];
     if (ultimo != 255) {
       int diff = (int)valor - (int)ultimo;
-      if (diff < 0) diff = -diff;
+      if (diff < 0)
+        diff = -diff;
       if (diff <= ZONA_MORTA)
         continue;
     }
@@ -102,10 +112,10 @@ void ControlReader::update() {
 
     if (_ccActivityCallback) {
       CCActivityInfo info;
-      info.label    = HardwareMap::getLabel(i);
-      info.cc       = cc;
-      info.valor    = valor;
-      info.canal    = canal;
+      info.label = HardwareMap::getLabel(i);
+      info.cc = cc;
+      info.valor = valor;
+      info.canal = canal;
       info.isRemoto = false;
       info.moduleAddress = 0;
       _ccActivityCallback(info);
@@ -117,7 +127,7 @@ void ControlReader::update() {
     return;
 
   uint8_t numLocais = _ucl->getNumLocais();
-  uint8_t numTotal  = _ucl->getNumControles();
+  uint8_t numTotal = _ucl->getNumControles();
 
   uint8_t moduleValues[I2CProtocol::MAX_CONTROLES_POR_MODULO];
 
@@ -150,12 +160,14 @@ void ControlReader::update() {
           break;
 
         uint8_t valor = moduleValues[c];
-        if (valor > 127) valor = 127;
+        if (valor > 127)
+          valor = 127;
 
         uint8_t ultimo = _ultimoValorRemoto[remoteIdx];
         if (ultimo != 255) {
           int diff = (int)valor - (int)ultimo;
-          if (diff < 0) diff = -diff;
+          if (diff < 0)
+            diff = -diff;
           if (diff <= ZONA_MORTA)
             break;
         }
@@ -168,11 +180,11 @@ void ControlReader::update() {
 
         if (_ccActivityCallback) {
           CCActivityInfo info;
-          info.label         = _ucl->getLabel(idx);
-          info.cc            = cc;
-          info.valor         = valor;
-          info.canal         = canal;
-          info.isRemoto      = true;
+          info.label = _ucl->getLabel(idx);
+          info.cc = cc;
+          info.valor = valor;
+          info.canal = canal;
+          info.isRemoto = true;
           info.moduleAddress = addr;
           _ccActivityCallback(info);
         }

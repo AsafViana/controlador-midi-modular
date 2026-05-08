@@ -259,6 +259,37 @@ void Storage::setVelocidade(uint8_t vel) {
   save();
 }
 
+// ── Calibração ───────────────────────────────────────────────────────────────
+
+uint16_t Storage::getCalibMin(uint8_t indice) const {
+  if (indice >= MAX_CONTROLES)
+    return 100;
+  return _calibration[indice].minVal;
+}
+
+uint16_t Storage::getCalibMax(uint8_t indice) const {
+  if (indice >= MAX_CONTROLES)
+    return 3900;
+  return _calibration[indice].maxVal;
+}
+
+bool Storage::hasCalibration(uint8_t indice) const {
+  if (indice >= MAX_CONTROLES)
+    return false;
+  return _calibration[indice].calibrated;
+}
+
+void Storage::setCalibration(uint8_t indice, uint16_t minVal, uint16_t maxVal) {
+  if (indice >= MAX_CONTROLES)
+    return;
+  if (minVal >= maxVal)
+    return; // Inválido
+  _calibration[indice].minVal = minVal;
+  _calibration[indice].maxVal = maxVal;
+  _calibration[indice].calibrated = true;
+  save();
+}
+
 // ── Controles Remotos ────────────────────────────────────────────────────────
 
 uint8_t Storage::addrToIndex(uint8_t i2cAddr) const {

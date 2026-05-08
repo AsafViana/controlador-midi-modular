@@ -46,6 +46,12 @@ public:
   uint8_t getVelocidade() const;
   void setVelocidade(uint8_t vel);
 
+  // ── Calibração por controle ──────────────────────────
+  uint16_t getCalibMin(uint8_t indice) const;
+  uint16_t getCalibMax(uint8_t indice) const;
+  void setCalibration(uint8_t indice, uint16_t minVal, uint16_t maxVal);
+  bool hasCalibration(uint8_t indice) const;
+
   // ── Controles Remotos ────────────────────────────────
   uint8_t getRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t cc);
@@ -68,6 +74,13 @@ private:
   uint8_t _velocidade = 100;
   bool _tecladoHabilitado = true;
   uint8_t _ccMap[HardwareMap::NUM_CONTROLES];
+
+  struct CalibData {
+    uint16_t minVal = 100;
+    uint16_t maxVal = 3900;
+    bool calibrated = false;
+  };
+  CalibData _calibration[HardwareMap::NUM_CONTROLES];
 
   struct RemoteCCConfig {
     uint8_t cc = 0;
