@@ -22,18 +22,34 @@ class I2CScanner;
  *
  * Respeita o flag de habilitado/desabilitado do Storage.
  * Inclui filtro de ruído (zona morta) para evitar flood.
+ *
+ * Parâmetros de tuning:
+ *   EMA_ALPHA  — peso da leitura atual no filtro (0=congela, 1=sem filtro).
+ *                0.30 é o ponto ideal para pot físico: suaviza ruído ADC
+ *                sem atrasar a resposta ao movimento do usuário.
+ *                Valores abaixo de 0.20 causam resposta lenta demais.
+ *
+ *   ZONA_MORTA — diferença mínima para disparar envio de CC.
+ *                Deve ser pequena (1-2) quando EMA_ALPHA >= 0.25,
+ *                pois o filtro já elimina micro-oscilações do ADC.
+ *                Com ALPHA baixo, a zona morta precisaria ser maior
+ *                para compensar — o que mascara movimento real.
  */
 class ControlReader {
 public:
   /// Zona morta: só envia CC se a diferença for maior que este valor.
+  /// Mantém 2 — adequado com EMA_ALPHA = 0.30 que já suaviza o ruído.
   static constexpr uint8_t ZONA_MORTA = 2;
 
   /// Limites de calibração do ADC (zona morta física do potenciômetro).
   static constexpr uint16_t ADC_MIN = 100;
   static constexpr uint16_t ADC_MAX = 3900;
 
-  /// Fator de suavização do filtro EMA (0 = sem filtro, 1 = sem memória).
-  static constexpr float EMA_ALPHA = 0.15f;
+  /// Fator de suavização do filtro EMA.
+  /// 0.30 = resposta rápida ao toque + ruído ADC eliminado.
+  /// Era 0.15 — muito lento: o valor filtrado não alcançava o real
+  /// a tempo, fazendo a zona morta bloquear envios legítimos.
+  static constexpr float EMA_ALPHA = 0.30f;
 
   /// Intervalo mínimo entre leituras (ms).
   static constexpr uint32_t INTERVALO_MS = 10;
@@ -53,8 +69,7 @@ public:
                 UnifiedControlList *ucl = nullptr,
                 I2CScanner *scanner = nullptr);
 
-  /// Inicializa os pinos analógicos. Chamar no setup().
-  void begin();
+  /// Inicializa os pinos analógicos. Chamar no setup().\n  void begin();
 
   /// Lê todos os controles e envia CC se necessário. Chamar no loop().
   void update();
