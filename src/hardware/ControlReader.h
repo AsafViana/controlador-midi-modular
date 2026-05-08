@@ -38,7 +38,6 @@ class I2CScanner;
 class ControlReader {
 public:
   /// Zona morta: só envia CC se a diferença for maior que este valor.
-  /// Mantém 2 — adequado com EMA_ALPHA = 0.30 que já suaviza o ruído.
   static constexpr uint8_t ZONA_MORTA = 2;
 
   /// Limites de calibração do ADC (zona morta física do potenciômetro).
@@ -47,7 +46,7 @@ public:
 
   /// Fator de suavização do filtro EMA.
   /// 0.30 = resposta rápida ao toque + ruído ADC eliminado.
-  /// Era 0.15 — muito lento: o valor filtrado não alcançava o real
+  /// Era 0.15 — muito lento: valor filtrado não alcançava o real
   /// a tempo, fazendo a zona morta bloquear envios legítimos.
   static constexpr float EMA_ALPHA = 0.30f;
 
@@ -61,15 +60,15 @@ public:
   /**
    * @param engine  Ponteiro para o MidiEngine (envio de CC)
    * @param storage Ponteiro para o Storage (CC map + habilitado)
-   * @param ucl     Ponteiro para a UnifiedControlList (nullptr = modo
-   * standalone)
+   * @param ucl     Ponteiro para a UnifiedControlList (nullptr = modo standalone)
    * @param scanner Ponteiro para o I2CScanner (nullptr = modo standalone)
    */
   ControlReader(MidiEngine *engine, Storage *storage,
                 UnifiedControlList *ucl = nullptr,
                 I2CScanner *scanner = nullptr);
 
-  /// Inicializa os pinos analógicos. Chamar no setup().\n  void begin();
+  /// Inicializa os pinos analógicos. Chamar no setup().
+  void begin();
 
   /// Lê todos os controles e envia CC se necessário. Chamar no loop().
   void update();
@@ -87,7 +86,6 @@ private:
   uint8_t _ultimoValorRemoto[MAX_REMOTE_CONTROLS];
   uint32_t _ultimaLeitura = 0;
 
-  /// Estado do filtro EMA por controle.
   float _emaValue[HardwareMap::NUM_CONTROLES];
   bool _emaInitialized[HardwareMap::NUM_CONTROLES];
 
