@@ -13,13 +13,15 @@
  * Schema version: sempre que NUM_CONTROLES mudar, o boot detecta
  * a versão desatualizada na NVS e executa factoryReset() automático,
  * evitando CCs errados herdados de arrays antigos.
+ *
+ * Nota: controles analógicos (locais e remotos) são sempre ativos.
+ * Os métodos isControleHabilitado e isRemoteEnabled retornam sempre
+ * true e existem apenas para compatibilidade de API.
  */
 class Storage {
 public:
   static constexpr uint8_t MAX_CONTROLES = HardwareMap::NUM_CONTROLES;
 
-  // Versão do schema NVS — muda automaticamente com NUM_CONTROLES.
-  // Se quiser forçar um reset por outra razão, incremente o +1.
   static constexpr uint8_t NVS_SCHEMA_VERSION =
       HardwareMap::NUM_CONTROLES + 1;
 
@@ -33,9 +35,10 @@ public:
   uint8_t getControladorCC(uint8_t indice) const;
   void setControladorCC(uint8_t indice, uint8_t cc);
 
-  // ── Habilitar/Desabilitar controles CC ───────────────
-  bool isControleHabilitado(uint8_t indice) const;
-  void setControleHabilitado(uint8_t indice, bool habilitado);
+  // ── Controles sempre ativos (sem flag habilitado) ────
+  // Retorna sempre true — todos os controles são ativos por definição.
+  bool isControleHabilitado(uint8_t indice) const { return true; }
+  void setControleHabilitado(uint8_t indice, bool habilitado) {}
 
   // ── Habilitar/Desabilitar teclado (notas) ────────────
   bool isTecladoHabilitado() const;
@@ -53,14 +56,13 @@ public:
   uint8_t getRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t cc);
 
-  bool isRemoteEnabled(uint8_t i2cAddr, uint8_t ctrlIdx) const;
-  void setRemoteEnabled(uint8_t i2cAddr, uint8_t ctrlIdx, bool enabled);
+  // Retorna sempre true — controles remotos são sempre ativos.
+  bool isRemoteEnabled(uint8_t i2cAddr, uint8_t ctrlIdx) const { return true; }
+  void setRemoteEnabled(uint8_t i2cAddr, uint8_t ctrlIdx, bool enabled) {}
 
   bool loadRemoteConfig(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t &cc,
                         bool &enabled) const;
 
-  /// Restaura todas as configurações para os valores padrão de fábrica.
-  /// Limpa o NVS e recarrega defaults do HardwareMap.
   void factoryReset();
 
 private:
@@ -68,12 +70,10 @@ private:
   uint8_t _oitava = 4;
   uint8_t _velocidade = 100;
   uint8_t _ccMap[HardwareMap::NUM_CONTROLES];
-  bool _ccHabilitado[HardwareMap::NUM_CONTROLES];
   bool _tecladoHabilitado = true;
 
   struct RemoteCCConfig {
     uint8_t cc;
-    bool enabled;
     bool hasData;
   };
 
