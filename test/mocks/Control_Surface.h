@@ -2,7 +2,6 @@
 #include "Arduino.h"
 #include <cstdint>
 
-
 // --- Minimal mock for Control_Surface library ---
 
 struct MIDIAddress {
@@ -54,6 +53,12 @@ public:
 
   void sendProgramChange(MIDIAddress addr) {
     mock_midi::lastMessage = {addr.note, addr.channel, 0, false, 0, 0, false};
+    mock_midi::messageCount++;
+  }
+
+  void sendSysEx(const uint8_t *data, uint16_t length) {
+    (void)data;
+    (void)length;
     mock_midi::messageCount++;
   }
 };

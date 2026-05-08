@@ -12,6 +12,7 @@ class OitavaScreen;
 class VelocidadeScreen;
 class ProgramChangeScreen;
 class CalibracaoScreen;
+class BackupScreen;
 
 class ConfigScreen : public Screen {
 public:
@@ -19,7 +20,8 @@ public:
                CanalScreen *canal, OitavaScreen *oitava,
                VelocidadeScreen *velocidade,
                ProgramChangeScreen *progChange = nullptr,
-               CalibracaoScreen *calibracao = nullptr);
+               CalibracaoScreen *calibracao = nullptr,
+               BackupScreen *backup = nullptr);
 
   void handleInput(NavInput input) override;
   bool handleBack() override;
@@ -35,11 +37,12 @@ private:
   VelocidadeScreen *_velocidade;
   ProgramChangeScreen *_progChange;
   CalibracaoScreen *_calibracao;
+  BackupScreen *_backup;
   TextComponent _titulo;
   ListComponent _lista;
 
   bool _confirmandoReset = false;
 
   static const char *_opcoes[];
-  static constexpr uint8_t NUM_OPCOES = 7;
+  static constexpr uint8_t NUM_OPCOES = 8;
 };

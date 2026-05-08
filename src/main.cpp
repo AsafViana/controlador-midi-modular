@@ -6,6 +6,8 @@
 #include "i2c/I2CScanner.h"
 #include "i2c/WireI2CBus.h"
 #include "midi/MidiEngine.h"
+#include "midi/SysExManager.h"
+#include "screens/BackupScreen.h"
 #include "screens/CCMapScreen.h"
 #include "screens/CalibracaoScreen.h"
 #include "screens/CanalScreen.h"
@@ -52,6 +54,8 @@ static PresetManager *presetManager = nullptr;
 static PresetScreen *presetScreen = nullptr;
 static ProgramChangeScreen *progChangeScreen = nullptr;
 static CalibracaoScreen *calibracaoScreen = nullptr;
+static SysExManager *sysExManager = nullptr;
+static BackupScreen *backupScreen = nullptr;
 
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
@@ -165,10 +169,12 @@ void setup() {
     presetScreen = new PresetScreen(app, storage, presetManager);
     progChangeScreen = new ProgramChangeScreen(engine, storage);
     calibracaoScreen = new CalibracaoScreen(storage);
+    sysExManager = new SysExManager(engine, storage);
+    backupScreen = new BackupScreen(app, sysExManager);
 
-    configScreen =
-        new ConfigScreen(app, storage, ccMapScreen, canalScreen, oitavaScreen,
-                         velScreen, progChangeScreen, calibracaoScreen);
+    configScreen = new ConfigScreen(app, storage, ccMapScreen, canalScreen,
+                                    oitavaScreen, velScreen, progChangeScreen,
+                                    calibracaoScreen, backupScreen);
     menuScreen = new MenuScreen(app, storage, perfScreen, configScreen,
                                 sobreScreen, presetScreen);
 

@@ -32,6 +32,13 @@ public:
                                           uint8_t canal);
   void onCCReceived(MidiCCReceivedCallback callback);
 
+  /// Callback para SysEx recebido
+  using SysExReceivedCallback = void (*)(const uint8_t *data, uint16_t length);
+  void onSysExReceived(SysExReceivedCallback callback);
+
+  /// Acesso à interface USB MIDI (para SysEx)
+  USBMIDI_Interface &getUsbMidi();
+
   /// Habilita/desabilita MIDI Thru (reenvio entre interfaces)
   void setMidiThru(bool enabled);
 
@@ -45,6 +52,7 @@ private:
 #endif
   MidiActivityCallback _activityCallback = nullptr;
   MidiCCReceivedCallback _ccReceivedCallback = nullptr;
+  SysExReceivedCallback _sysExReceivedCallback = nullptr;
   bool _midiThruEnabled = true;
   uint8_t _receiveChannel = 0; // 0 = todos
 

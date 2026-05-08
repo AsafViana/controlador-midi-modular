@@ -74,6 +74,12 @@ void MidiEngine::onCCReceived(MidiCCReceivedCallback callback) {
   _ccReceivedCallback = callback;
 }
 
+void MidiEngine::onSysExReceived(SysExReceivedCallback callback) {
+  _sysExReceivedCallback = callback;
+}
+
+USBMIDI_Interface &MidiEngine::getUsbMidi() { return _midi; }
+
 void MidiEngine::setMidiThru(bool enabled) { _midiThruEnabled = enabled; }
 
 void MidiEngine::setReceiveChannel(uint8_t canal) {

@@ -1,5 +1,6 @@
 #include "screens/ConfigScreen.h"
 #include "config.h"
+#include "screens/BackupScreen.h"
 #include "screens/CCMapScreen.h"
 #include "screens/CalibracaoScreen.h"
 #include "screens/CanalScreen.h"
@@ -11,16 +12,17 @@
 
 const char *ConfigScreen::_opcoes[] = {"Mapa CC",    "Canal MIDI",  "Oitava",
                                        "Velocidade", "Prog Change", "Calibrar",
-                                       "Restaurar"};
+                                       "Backup",     "Restaurar"};
 
 ConfigScreen::ConfigScreen(OledApp *app, Storage *storage, CCMapScreen *ccMap,
                            CanalScreen *canal, OitavaScreen *oitava,
                            VelocidadeScreen *velocidade,
                            ProgramChangeScreen *progChange,
-                           CalibracaoScreen *calibracao)
+                           CalibracaoScreen *calibracao, BackupScreen *backup)
     : _app(app), _storage(storage), _ccMap(ccMap), _canal(canal),
       _oitava(oitava), _velocidade(velocidade), _progChange(progChange),
-      _calibracao(calibracao), _titulo(0, 0, "Configuracoes", 1),
+      _calibracao(calibracao), _backup(backup),
+      _titulo(0, 0, "Configuracoes", 1),
       _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT, 1),
       _confirmandoReset(false) {
   addChild(&_titulo);
@@ -128,6 +130,10 @@ void ConfigScreen::handleInput(NavInput input) {
         router.push(_calibracao);
       break;
     case 6:
+      if (_backup)
+        router.push(_backup);
+      break;
+    case 7:
       // Factory reset — pede confirmação
       _confirmandoReset = true;
       markDirty();
