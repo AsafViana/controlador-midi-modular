@@ -17,6 +17,10 @@
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
 
+#ifdef ARDUINO
+#include <Arduino.h>
+#endif
+
 #ifndef FIRMWARE_VERSION
 #define FIRMWARE_VERSION "dev"
 #endif
@@ -39,6 +43,11 @@ static VelocidadeScreen*   velScreen     = nullptr;
 static ConfigScreen*       configScreen  = nullptr;
 static MenuScreen*         menuScreen    = nullptr;
 static SobreScreen*        sobreScreen   = nullptr;
+
+// ── DEBUG ADC ────────────────────────────────────────────────────────────────
+// Remove apos diagnostico do pot
+static uint32_t _debugTimer = 0;
+// ─────────────────────────────────────────────────────────────────────────────
 
 void onMidiActivity() {
     if (app) app->getMidiActivity().trigger();
@@ -74,13 +83,9 @@ void onCCActivity(const CCActivityInfo& info) {
 }
 
 void setup() {
-    // [1] USB MIDI — DEVE ser o primeiro, antes de Serial.begin()
-    // O TinyUSB precisa ser configurado antes que qualquer outro
-    // subsistema USB (incluindo Serial CDC) seja iniciado.
     engine = new MidiEngine();
     engine->begin();
 
-    // [2] Serial debug — apenas apos USB estar configurado
     Serial.begin(115200);
     delay(500);
     Serial.println("=== BOOT START ===");
@@ -89,8 +94,6 @@ void setup() {
     storage = new Storage();
     storage->begin();
 
-    // [4] I2C — Wire.begin() chamado UMA vez aqui via WireI2CBus.
-    // OledApp::begin() reutiliza o barramento sem chamar Wire.begin() novamente.
     Serial.println("[4] i2c");
     i2cBus  = new WireI2CBus();
     scanner = new I2CScanner(i2cBus);
@@ -158,6 +161,19 @@ void setup() {
 }
 
 void loop() {
+    // ── DEBUG ADC: imprime valor bruto a cada 200ms ───────────────────────────
+    // Remove apos confirmar que o pot esta respondendo
+    uint32_t now = millis();
+    if (now - _debugTimer >= 200) {
+        _debugTimer = now;
+        int raw = analogRead(HardwareMap::getGpio(0)); // GPIO do Pot Extra (idx=0)
+        Serial.print("ADC raw=");
+        Serial.print(raw);
+        Serial.print("  CC=");
+        Serial.println(map(constrain(raw, 100, 3900), 100, 3900, 0, 127));
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     if (controlReader) controlReader->update();
     if (scanner)       scanner->periodicScan();
     if (ucl && scanner && scanner->needsRebuild()) {
