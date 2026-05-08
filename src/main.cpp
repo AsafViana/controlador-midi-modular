@@ -19,6 +19,7 @@
 #include "screens/ProgramChangeScreen.h"
 #include "screens/SobreScreen.h"
 #include "screens/VelocidadeScreen.h"
+#include "screens/WizardScreen.h"
 #include "storage/PresetManager.h"
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
@@ -56,6 +57,7 @@ static ProgramChangeScreen *progChangeScreen = nullptr;
 static CalibracaoScreen *calibracaoScreen = nullptr;
 static SysExManager *sysExManager = nullptr;
 static BackupScreen *backupScreen = nullptr;
+static WizardScreen *wizardScreen = nullptr;
 
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
@@ -208,6 +210,12 @@ void setup() {
 
     Serial.println("[11] router");
     app->getRouter().push(menuScreen);
+
+    // First-run wizard — exibe no primeiro boot
+    wizardScreen = new WizardScreen(app, storage);
+    if (WizardScreen::deveExibir(storage)) {
+      app->getRouter().push(wizardScreen);
+    }
 
     // [12] Timeout de inatividade — volta para Performance após 60s sem input
     app->setIdleScreen(perfScreen);
