@@ -52,6 +52,10 @@ public:
   void setCalibration(uint8_t indice, uint16_t minVal, uint16_t maxVal);
   bool hasCalibration(uint8_t indice) const;
 
+  // ── Curva de resposta por controle ───────────────────
+  uint8_t getCurva(uint8_t indice) const;
+  void setCurva(uint8_t indice, uint8_t curva);
+
   // ── Controles Remotos ────────────────────────────────
   uint8_t getRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t cc);
@@ -81,6 +85,8 @@ private:
     bool calibrated = false;
   };
   CalibData _calibration[HardwareMap::NUM_CONTROLES];
+
+  uint8_t _curvas[HardwareMap::NUM_CONTROLES]; // CurvaResposta enum value
 
   struct RemoteCCConfig {
     uint8_t cc = 0;

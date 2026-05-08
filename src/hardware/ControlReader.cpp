@@ -1,4 +1,5 @@
 #include "hardware/ControlReader.h"
+#include "hardware/ResponseCurve.h"
 #include "i2c/I2CScanner.h"
 #include "midi/MidiCC.h"
 #include "midi/MidiEngine.h"
@@ -74,6 +75,10 @@ uint8_t ControlReader::lerControle(uint8_t indice) {
   if (HardwareMap::isInvertido(indice)) {
     valor = 127 - valor;
   }
+
+  // Aplica curva de resposta configurada
+  CurvaResposta curva = static_cast<CurvaResposta>(_storage->getCurva(indice));
+  valor = ResponseCurve::aplicar(curva, valor);
 
   return valor;
 }

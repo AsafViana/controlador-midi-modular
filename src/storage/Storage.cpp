@@ -43,8 +43,10 @@ uint8_t Storage::calculateCRC() const {
 
 void Storage::begin() {
   // Inicializa defaults em memória
-  for (uint8_t i = 0; i < MAX_CONTROLES; i++)
+  for (uint8_t i = 0; i < MAX_CONTROLES; i++) {
     _ccMap[i] = HardwareMap::getCCPadrao(i);
+    _curvas[i] = 0; // LINEAR
+  }
 
   _tecladoHabilitado = true;
 
@@ -287,6 +289,23 @@ void Storage::setCalibration(uint8_t indice, uint16_t minVal, uint16_t maxVal) {
   _calibration[indice].minVal = minVal;
   _calibration[indice].maxVal = maxVal;
   _calibration[indice].calibrated = true;
+  save();
+}
+
+// ── Curva de resposta ────────────────────────────────────────────────────────
+
+uint8_t Storage::getCurva(uint8_t indice) const {
+  if (indice >= MAX_CONTROLES)
+    return 0; // LINEAR
+  return _curvas[indice];
+}
+
+void Storage::setCurva(uint8_t indice, uint8_t curva) {
+  if (indice >= MAX_CONTROLES)
+    return;
+  if (curva > 2)
+    curva = 0; // Fallback para LINEAR
+  _curvas[indice] = curva;
   save();
 }
 
