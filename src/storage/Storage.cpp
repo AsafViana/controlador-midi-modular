@@ -309,6 +309,17 @@ void Storage::setCurva(uint8_t indice, uint8_t curva) {
   save();
 }
 
+// ── Idioma ───────────────────────────────────────────────────────────────────
+
+uint8_t Storage::getIdioma() const { return _idioma; }
+
+void Storage::setIdioma(uint8_t idioma) {
+  if (idioma > 1)
+    idioma = 0;
+  _idioma = idioma;
+  save();
+}
+
 // ── Controles Remotos ────────────────────────────────────────────────────────
 
 uint8_t Storage::addrToIndex(uint8_t i2cAddr) const {

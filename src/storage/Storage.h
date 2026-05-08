@@ -56,6 +56,10 @@ public:
   uint8_t getCurva(uint8_t indice) const;
   void setCurva(uint8_t indice, uint8_t curva);
 
+  // ── Idioma ───────────────────────────────────────────
+  uint8_t getIdioma() const;
+  void setIdioma(uint8_t idioma);
+
   // ── Controles Remotos ────────────────────────────────
   uint8_t getRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t cc);
@@ -87,6 +91,7 @@ private:
   CalibData _calibration[HardwareMap::NUM_CONTROLES];
 
   uint8_t _curvas[HardwareMap::NUM_CONTROLES]; // CurvaResposta enum value
+  uint8_t _idioma = 0;                         // 0=PT, 1=EN
 
   struct RemoteCCConfig {
     uint8_t cc = 0;
