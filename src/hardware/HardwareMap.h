@@ -69,6 +69,12 @@ constexpr uint8_t CC_AUTO_POOL_SIZE =
 // GPIOs 1, 2, 3, 6, 7, 8 estão livres para potenciômetros
 constexpr ControleHW CONTROLES[] = {
     {"Pot Extra", 7, TipoControle::POTENCIOMETRO, 0, false}, // CC auto
+    {"Volume", 1, TipoControle::POTENCIOMETRO, 7, false},    // CC 7 (Volume)
+    {"Pan", 2, TipoControle::POTENCIOMETRO, 10, false},      // CC 10 (Pan)
+    {"Modulacao", 3, TipoControle::POTENCIOMETRO, 1, false}, // CC 1 (Mod)
+    {"Sensor Luz", 6, TipoControle::SENSOR, 74, true},       // CC 74, invertido
+    {"Expressao", 8, TipoControle::POTENCIOMETRO, 11,
+     false}, // CC 11 (Expression)
 };
 
 constexpr uint8_t NUM_CONTROLES = sizeof(CONTROLES) / sizeof(CONTROLES[0]);
