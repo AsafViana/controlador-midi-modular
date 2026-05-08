@@ -67,7 +67,7 @@ constexpr uint8_t CC_AUTO_POOL_SIZE =
 // ── Controles MIDI endereçáveis a CC ─────────────────
 // GPIOs 1, 2, 3, 6, 7, 8 estão livres para potenciômetros
 constexpr ControleHW CONTROLES[] = {
-    {"Pot Extra", 7, TipoControle::POTENCIOMETRO, 0, false}, // CC auto
+    {"Pot Extra", 7, TipoControle::POTENCIOMETRO, 0, true}, // CC auto
 };
 
 constexpr uint8_t NUM_CONTROLES = sizeof(CONTROLES) / sizeof(CONTROLES[0]);
