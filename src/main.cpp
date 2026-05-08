@@ -44,10 +44,7 @@ static ConfigScreen*       configScreen  = nullptr;
 static MenuScreen*         menuScreen    = nullptr;
 static SobreScreen*        sobreScreen   = nullptr;
 
-// ── DEBUG ADC ────────────────────────────────────────────────────────────────
-// Remove apos diagnostico do pot
 static uint32_t _debugTimer = 0;
-// ─────────────────────────────────────────────────────────────────────────────
 
 void onMidiActivity() {
     if (app) app->getMidiActivity().trigger();
@@ -161,18 +158,18 @@ void setup() {
 }
 
 void loop() {
-    // ── DEBUG ADC: imprime valor bruto a cada 200ms ───────────────────────────
-    // Remove apos confirmar que o pot esta respondendo
+    // DEBUG: primeiro no loop, antes de qualquer outra coisa
+    // Se isso aparecer no Serial, o loop() esta rodando.
+    // Se nao aparecer, algo no setup() esta travando apos BOOT OK.
     uint32_t now = millis();
-    if (now - _debugTimer >= 200) {
+    if (now - _debugTimer >= 500) {
         _debugTimer = now;
-        int raw = analogRead(HardwareMap::getGpio(0)); // GPIO do Pot Extra (idx=0)
-        Serial.print("ADC raw=");
+        int raw = analogRead(HardwareMap::getGpio(0));
+        Serial.print("LOOP raw=");
         Serial.print(raw);
-        Serial.print("  CC=");
+        Serial.print(" CC=");
         Serial.println(map(constrain(raw, 100, 3900), 100, 3900, 0, 127));
     }
-    // ─────────────────────────────────────────────────────────────────────────
 
     if (controlReader) controlReader->update();
     if (scanner)       scanner->periodicScan();
