@@ -59,6 +59,20 @@ void onMidiActivity() {
     app->getMidiActivity().trigger();
 }
 
+void onMidiCCReceived(uint8_t cc, uint8_t valor, uint8_t canal) {
+  // Atualiza PerformanceScreen com CC recebido externamente
+  if (perfScreen) {
+    CCActivityInfo info;
+    info.label = "MIDI IN";
+    info.cc = cc;
+    info.valor = valor;
+    info.canal = canal;
+    info.isRemoto = false;
+    info.moduleAddress = 0;
+    perfScreen->atualizarCCInfo(info);
+  }
+}
+
 void onCCActivity(const CCActivityInfo &info) {
   if (perfScreen)
     perfScreen->atualizarCCInfo(info);
@@ -164,6 +178,7 @@ void setup() {
 
     Serial.println("[9] activity");
     engine->onActivity(onMidiActivity);
+    engine->onCCReceived(onMidiCCReceived);
     controlReader->onCCActivity(onCCActivity);
 
     Serial.println("[10] buttons");
@@ -189,6 +204,7 @@ void setup() {
   } else {
     // Modo headless: apenas registra callback de atividade MIDI
     engine->onActivity(onMidiActivity);
+    engine->onCCReceived(onMidiCCReceived);
     controlReader->onCCActivity(onCCActivity);
   }
 
@@ -204,6 +220,8 @@ void setup() {
 }
 
 void loop() {
+  if (engine)
+    engine->update();
   if (controlReader)
     controlReader->update();
   if (scanner)

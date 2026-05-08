@@ -69,3 +69,63 @@ void MidiEngine::sendProgramChange(uint8_t program, uint8_t canal) {
 #endif
   notifyActivity();
 }
+
+void MidiEngine::onCCReceived(MidiCCReceivedCallback callback) {
+  _ccReceivedCallback = callback;
+}
+
+void MidiEngine::setMidiThru(bool enabled) { _midiThruEnabled = enabled; }
+
+void MidiEngine::setReceiveChannel(uint8_t canal) {
+  _receiveChannel = (canal > 16) ? 0 : canal;
+}
+
+void MidiEngine::update() {
+#ifdef ARDUINO
+  // Lê mensagens MIDI recebidas via USB
+  MIDIReadEvent usbEvent = _midi.read();
+  if (usbEvent != MIDIReadEvent::NO_MESSAGE) {
+    ChannelMessage msg = _midi.getChannelMessage();
+    uint8_t msgCanal = msg.getChannel().getRaw() + 1; // 1-based
+
+    // Filtro de canal
+    if (_receiveChannel == 0 || msgCanal == _receiveChannel) {
+      // Processa CC recebido
+      if (msg.getMessageType() == MIDIMessageType::ControlChange) {
+        uint8_t cc = msg.getData1();
+        uint8_t valor = msg.getData2();
+        if (_ccReceivedCallback) {
+          _ccReceivedCallback(cc, valor, msgCanal);
+        }
+      }
+
+      // MIDI Thru: USB → DIN
+      if (_midiThruEnabled) {
+        _midiDIN.send(msg);
+      }
+    }
+  }
+
+  // Lê mensagens MIDI recebidas via DIN
+  MIDIReadEvent dinEvent = _midiDIN.read();
+  if (dinEvent != MIDIReadEvent::NO_MESSAGE) {
+    ChannelMessage msg = _midiDIN.getChannelMessage();
+    uint8_t msgCanal = msg.getChannel().getRaw() + 1;
+
+    if (_receiveChannel == 0 || msgCanal == _receiveChannel) {
+      if (msg.getMessageType() == MIDIMessageType::ControlChange) {
+        uint8_t cc = msg.getData1();
+        uint8_t valor = msg.getData2();
+        if (_ccReceivedCallback) {
+          _ccReceivedCallback(cc, valor, msgCanal);
+        }
+      }
+
+      // MIDI Thru: DIN → USB
+      if (_midiThruEnabled) {
+        _midi.send(msg);
+      }
+    }
+  }
+#endif
+}

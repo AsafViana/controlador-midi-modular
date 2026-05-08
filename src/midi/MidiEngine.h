@@ -21,8 +21,22 @@ public:
   void sendCC(const MidiCC &cc);
   void sendProgramChange(uint8_t program, uint8_t canal);
 
+  /// Processa mensagens MIDI recebidas (USB e DIN). Chamar no loop().
+  void update();
+
   /// Registra callback chamado a cada mensagem MIDI enviada.
   void onActivity(MidiActivityCallback callback);
+
+  /// Callback para CC recebido externamente (MIDI IN)
+  using MidiCCReceivedCallback = void (*)(uint8_t cc, uint8_t valor,
+                                          uint8_t canal);
+  void onCCReceived(MidiCCReceivedCallback callback);
+
+  /// Habilita/desabilita MIDI Thru (reenvio entre interfaces)
+  void setMidiThru(bool enabled);
+
+  /// Define filtro de canal para MIDI IN (0 = aceitar todos)
+  void setReceiveChannel(uint8_t canal);
 
 private:
   USBMIDI_Interface _midi;
@@ -30,6 +44,9 @@ private:
   HardwareSerialMIDI_Interface _midiDIN{Serial1};
 #endif
   MidiActivityCallback _activityCallback = nullptr;
+  MidiCCReceivedCallback _ccReceivedCallback = nullptr;
+  bool _midiThruEnabled = true;
+  uint8_t _receiveChannel = 0; // 0 = todos
 
   /// Notifica o callback de atividade (se registrado).
   void notifyActivity();
