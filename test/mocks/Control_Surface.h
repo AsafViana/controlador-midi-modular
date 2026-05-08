@@ -61,6 +61,11 @@ public:
     (void)length;
     mock_midi::messageCount++;
   }
+
+  void sendRealTime(uint8_t msg) {
+    (void)msg;
+    mock_midi::messageCount++;
+  }
 };
 
 // Mock for Control_Surface singleton

@@ -6,6 +6,7 @@
 #include "hardware/UnifiedControlList.h"
 #include "i2c/I2CScanner.h"
 #include "i2c/WireI2CBus.h"
+#include "midi/MidiClock.h"
 #include "midi/MidiEngine.h"
 #include "midi/SysExManager.h"
 #include "screens/BackupScreen.h"
@@ -59,6 +60,7 @@ static CalibracaoScreen *calibracaoScreen = nullptr;
 static SysExManager *sysExManager = nullptr;
 static BackupScreen *backupScreen = nullptr;
 static WizardScreen *wizardScreen = nullptr;
+static MidiClock *midiClock = nullptr;
 
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
@@ -118,6 +120,9 @@ void setup() {
   // [1] USB MIDI — DEVE ser o primeiro, antes de Serial.begin()
   engine = new MidiEngine();
   engine->begin();
+
+  midiClock = new MidiClock(engine);
+  // Clock desabilitado por padrão — ativar via menu
 
   // [2] Serial debug
   Serial.begin(115200);
@@ -240,6 +245,8 @@ void setup() {
 void loop() {
   if (engine)
     engine->update();
+  if (midiClock)
+    midiClock->update();
   if (controlReader)
     controlReader->update();
   if (scanner)
