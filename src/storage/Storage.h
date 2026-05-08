@@ -60,6 +60,10 @@ public:
   uint8_t getIdioma() const;
   void setIdioma(uint8_t idioma);
 
+  // ── Contraste do display ─────────────────────────────
+  uint8_t getContraste() const; // 0=Baixo, 1=Medio, 2=Alto
+  void setContraste(uint8_t nivel);
+
   // ── Controles Remotos ────────────────────────────────
   uint8_t getRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx) const;
   void setRemoteCC(uint8_t i2cAddr, uint8_t ctrlIdx, uint8_t cc);
@@ -92,6 +96,7 @@ private:
 
   uint8_t _curvas[HardwareMap::NUM_CONTROLES]; // CurvaResposta enum value
   uint8_t _idioma = 0;                         // 0=PT, 1=EN
+  uint8_t _contraste = 2;                      // 0=Baixo, 1=Medio, 2=Alto
 
   struct RemoteCCConfig {
     uint8_t cc = 0;

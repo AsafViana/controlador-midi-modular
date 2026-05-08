@@ -320,6 +320,17 @@ void Storage::setIdioma(uint8_t idioma) {
   save();
 }
 
+// ── Contraste ────────────────────────────────────────────────────────────────
+
+uint8_t Storage::getContraste() const { return _contraste; }
+
+void Storage::setContraste(uint8_t nivel) {
+  if (nivel > 2)
+    nivel = 2;
+  _contraste = nivel;
+  save();
+}
+
 // ── Controles Remotos ────────────────────────────────────────────────────────
 
 uint8_t Storage::addrToIndex(uint8_t i2cAddr) const {
