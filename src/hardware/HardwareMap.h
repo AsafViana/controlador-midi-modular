@@ -42,6 +42,14 @@ constexpr uint8_t PIN_BTN_SELECT = 13;
 constexpr uint8_t PIN_BTN_BACK = 14;
 constexpr uint8_t PIN_LED = 0;
 
+// ── LED RGB (catodo comum) ───────────────────────────
+// Defina RGB_LED_ENABLED como true para ativar o LED RGB.
+// Se false, o sistema usa apenas o LED simples (PIN_LED).
+constexpr bool RGB_LED_ENABLED = false;
+constexpr uint8_t PIN_LED_R = 15; // Vermelho (PWM)
+constexpr uint8_t PIN_LED_G = 16; // Verde (PWM)
+constexpr uint8_t PIN_LED_B = 17; // Azul (PWM)
+
 // ── MIDI DIN (Serial1) ───────────────────────────────
 constexpr uint8_t PIN_MIDI_TX = 9;  // TX para MIDI DIN OUT
 constexpr uint8_t PIN_MIDI_RX = 10; // RX para MIDI DIN IN

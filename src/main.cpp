@@ -2,6 +2,7 @@
 #include "config.h"
 #include "hardware/ControlReader.h"
 #include "hardware/HardwareMap.h"
+#include "hardware/StatusLed.h"
 #include "hardware/UnifiedControlList.h"
 #include "i2c/I2CScanner.h"
 #include "i2c/WireI2CBus.h"
@@ -61,10 +62,13 @@ static WizardScreen *wizardScreen = nullptr;
 
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
+static StatusLed *statusLed = nullptr;
 
 void onMidiActivity() {
   if (app)
     app->getMidiActivity().trigger();
+  if (statusLed)
+    statusLed->triggerMidiFlash();
 }
 
 void onMidiCCReceived(uint8_t cc, uint8_t valor, uint8_t canal) {
@@ -140,20 +144,15 @@ void setup() {
   controlReader->begin();
 
   Serial.println("[6] LED");
-  pinMode(HardwareMap::PIN_LED, OUTPUT);
+  statusLed = new StatusLed();
+  statusLed->begin();
 
   Serial.println("[7] app/display");
   app = new OledApp();
   if (!app->begin(DISPLAY_I2C_ADDRESS)) {
     Serial.println("ERRO: Display OLED falhou — modo headless ativo");
     headlessMode = true;
-    // LED pisca 2x rápido para indicar modo headless
-    for (int i = 0; i < 2; i++) {
-      digitalWrite(HardwareMap::PIN_LED, HIGH);
-      delay(100);
-      digitalWrite(HardwareMap::PIN_LED, LOW);
-      delay(100);
-    }
+    statusLed->setEstado(StatusLed::Estado::ERRO);
     delete app;
     app = nullptr;
   }
@@ -251,17 +250,14 @@ void loop() {
   }
 
   if (headlessMode) {
-    // Modo headless: LED pisca 2x curtas a cada 3 segundos
-    uint32_t now = millis();
-    uint32_t phase = (now - headlessLedTimer) % 3000;
-    if (phase < 100 || (phase >= 200 && phase < 300)) {
-      digitalWrite(HardwareMap::PIN_LED, HIGH);
-    } else {
-      digitalWrite(HardwareMap::PIN_LED, LOW);
-    }
+    // Modo headless: StatusLed mostra estado ERRO (vermelho/ligado)
+    if (statusLed)
+      statusLed->update();
   } else {
     if (app)
       app->update();
+    if (statusLed)
+      statusLed->update();
   }
 
 #ifdef ARDUINO
