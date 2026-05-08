@@ -28,7 +28,6 @@ private:
   Storage *_storage;
   UnifiedControlList *_ucl;
   TextComponent _titulo;
-  TextComponent _voltar;
   TextComponent _sobre;
   TextComponent _versao;
   TextComponent _infoCanal;

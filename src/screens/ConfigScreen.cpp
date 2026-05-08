@@ -7,8 +7,8 @@
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
 
-const char *ConfigScreen::_opcoes[] = {"Mapa CC",    "Canal MIDI", "Oitava",
-                                       "Velocidade", "Restaurar",  "Voltar"};
+const char *ConfigScreen::_opcoes[] = {"Mapa CC", "Canal MIDI", "Oitava",
+                                       "Velocidade", "Restaurar"};
 
 ConfigScreen::ConfigScreen(OledApp *app, Storage *storage, CCMapScreen *ccMap,
                            CanalScreen *canal, OitavaScreen *oitava,
@@ -16,11 +16,9 @@ ConfigScreen::ConfigScreen(OledApp *app, Storage *storage, CCMapScreen *ccMap,
     : _app(app), _storage(storage), _ccMap(ccMap), _canal(canal),
       _oitava(oitava), _velocidade(velocidade),
       _titulo(0, 0, "Configuracoes", 1),
-      _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1),
       _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT, 1),
       _confirmandoReset(false) {
   addChild(&_titulo);
-  addChild(&_voltar);
   addChild(&_lista);
   _lista.setItems(_opcoes, NUM_OPCOES);
   _lista.setUpButton(ButtonEvent::LONG_PRESS);
@@ -30,6 +28,15 @@ ConfigScreen::ConfigScreen(OledApp *app, Storage *storage, CCMapScreen *ccMap,
 void ConfigScreen::onMount() {
   _confirmandoReset = false;
   markDirty();
+}
+
+bool ConfigScreen::handleBack() {
+  if (_confirmandoReset) {
+    _confirmandoReset = false;
+    markDirty();
+    return true; // Evento tratado — não faz pop
+  }
+  return false; // Deixa o Router fazer pop
 }
 
 void ConfigScreen::render(Adafruit_SSD1306 &display) {
@@ -48,7 +55,7 @@ void ConfigScreen::render(Adafruit_SSD1306 &display) {
     display.setCursor(0, CONTENT_Y + 30);
     display.print("SELECT = Confirmar");
     display.setCursor(0, CONTENT_Y + 40);
-    display.print("UP/DOWN = Cancelar");
+    display.print("BACK = Cancelar");
   } else {
     renderChildren(display);
   }
@@ -67,6 +74,7 @@ void ConfigScreen::handleInput(NavInput input) {
       break;
     case NavInput::UP:
     case NavInput::DOWN:
+    case NavInput::BACK:
       // Cancela
       _confirmandoReset = false;
       markDirty();
@@ -110,9 +118,6 @@ void ConfigScreen::handleInput(NavInput input) {
       // Factory reset — pede confirmação
       _confirmandoReset = true;
       markDirty();
-      break;
-    case 5:
-      router.pop();
       break;
     }
     break;

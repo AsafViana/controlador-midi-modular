@@ -47,7 +47,6 @@ private:
 
   // Componentes visuais — coluna esquerda (estado MIDI)
   TextComponent _titulo;
-  TextComponent _voltar;
   TextComponent _infoCanal;
 
   // Componentes visuais — monitor CC (metade inferior)

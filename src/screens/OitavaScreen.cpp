@@ -5,10 +5,10 @@
 
 OitavaScreen::OitavaScreen(Storage *storage)
     : _storage(storage), _titulo(0, 0, "Oitava", 1),
-      _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1),
-      _valorComp(0, CONTENT_Y, "4", 2) {
+      _hint(0, OLED_HEIGHT - 8, "SEL=Salvar  BACK=Canc", 1),
+      _valorComp(0, CONTENT_Y + 8, "4", 2) {
   addChild(&_titulo);
-  addChild(&_voltar);
+  addChild(&_hint);
   addChild(&_valorComp);
 }
 
@@ -16,9 +16,18 @@ void OitavaScreen::setApp(OledApp *app) { _app = app; }
 
 void OitavaScreen::onMount() {
   _oitava = _storage->getOitava();
+  _oitavaOriginal = _oitava;
   snprintf(_buf, sizeof(_buf), "%d", _oitava);
   _valorComp.setText(_buf);
   markDirty();
+}
+
+bool OitavaScreen::handleBack() {
+  // Restaura valor original e volta
+  _oitava = _oitavaOriginal;
+  if (_app)
+    _app->getRouter().pop();
+  return true;
 }
 
 void OitavaScreen::handleInput(NavInput input) {

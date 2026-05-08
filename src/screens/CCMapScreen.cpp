@@ -8,10 +8,8 @@
 
 CCMapScreen::CCMapScreen(Storage *storage, UnifiedControlList *ucl)
     : _storage(storage), _app(nullptr), _ucl(ucl),
-      _titulo(0, 0, "Endereco CC", 1),
-      _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1) {
+      _titulo(0, 0, "Endereco CC", 1) {
   addChild(&_titulo);
-  addChild(&_voltar);
 }
 
 uint8_t CCMapScreen::getTotalControles() const {
@@ -94,6 +92,23 @@ void CCMapScreen::onMount() {
   _indice = 0;
   _modo = ModoEdicao::AGUARDANDO_CONTROLE;
   markDirty();
+}
+
+bool CCMapScreen::handleBack() {
+  // Se estiver editando, cancela a edição sem salvar
+  if (_modo == ModoEdicao::EDITAR_CC || _modo == ModoEdicao::EDITAR_ONOFF) {
+    _modo = ModoEdicao::AGUARDANDO_CONTROLE;
+    markDirty();
+    return true;
+  }
+  // Se estiver no modo NENHUM (lista), volta para aguardando
+  if (_modo == ModoEdicao::NENHUM) {
+    _modo = ModoEdicao::AGUARDANDO_CONTROLE;
+    markDirty();
+    return true;
+  }
+  // AGUARDANDO_CONTROLE: deixa o Router fazer pop
+  return false;
 }
 
 void CCMapScreen::notifyControlMoved(uint8_t unifiedIndex) {

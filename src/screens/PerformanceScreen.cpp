@@ -6,14 +6,12 @@
 
 PerformanceScreen::PerformanceScreen(MidiEngine *engine, Storage *storage)
     : _engine(engine), _storage(storage), _titulo(0, 0, "Performance", 1),
-      _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1),
       _infoCanal(0, CONTENT_Y, "Canal: 1  Oit: 4", 1),
       _monitorLabel(0, CONTENT_Y + 12, "-- nenhum --", 1),
       _monitorCC(0, CONTENT_Y + 22, "CC: ---  Val: ---", 1),
       _monitorModulo(0, CONTENT_Y + 32, "Modulo: ---", 1),
       _barraCC(0, CONTENT_Y + 42, OLED_WIDTH, 6) {
   addChild(&_titulo);
-  addChild(&_voltar);
   addChild(&_infoCanal);
   addChild(&_monitorLabel);
   addChild(&_monitorCC);
@@ -64,10 +62,6 @@ void PerformanceScreen::handleInput(NavInput input) {
     }
     break;
   }
-  case NavInput::SELECT:
-    if (_app)
-      _app->getRouter().pop();
-    break;
   default:
     break;
   }

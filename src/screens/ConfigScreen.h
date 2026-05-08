@@ -18,6 +18,7 @@ public:
                VelocidadeScreen *velocidade);
 
   void handleInput(NavInput input) override;
+  bool handleBack() override;
   void onMount() override;
   void render(Adafruit_SSD1306 &display) override;
 
@@ -29,11 +30,10 @@ private:
   OitavaScreen *_oitava;
   VelocidadeScreen *_velocidade;
   TextComponent _titulo;
-  TextComponent _voltar;
   ListComponent _lista;
 
   bool _confirmandoReset = false;
 
   static const char *_opcoes[];
-  static constexpr uint8_t NUM_OPCOES = 6;
+  static constexpr uint8_t NUM_OPCOES = 5;
 };

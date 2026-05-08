@@ -1,18 +1,21 @@
 #include "screens/MenuScreen.h"
-#include <cstdio>
 #include "config.h"
 #include "screens/ConfigScreen.h"
 #include "screens/PerformanceScreen.h"
+#include "screens/PresetScreen.h"
 #include "screens/SobreScreen.h"
 #include "storage/Storage.h"
 #include "ui/OledApp.h"
+#include <cstdio>
 
-const char *MenuScreen::_opcoes[] = {"Performance", "Configuracoes", "Sobre"};
+const char *MenuScreen::_opcoes[] = {"Performance", "Presets", "Configuracoes",
+                                     "Sobre"};
 
 MenuScreen::MenuScreen(OledApp *app, Storage *storage, PerformanceScreen *perf,
-                       ConfigScreen *config, SobreScreen *sobre)
+                       ConfigScreen *config, SobreScreen *sobre,
+                       PresetScreen *presets)
     : _app(app), _storage(storage), _perf(perf), _config(config), _sobre(sobre),
-      _titulo(0, 0, "Menu Principal", 1),
+      _presets(presets), _titulo(0, 0, "Menu Principal", 1),
       _lista(0, CONTENT_Y, OLED_WIDTH, CONTENT_HEIGHT - 10, 1),
       _status(0, OLED_HEIGHT - 8, "Ch:1 Oit:4 Vel:100", 1) {
   addChild(&_titulo);
@@ -58,10 +61,14 @@ void MenuScreen::handleInput(NavInput input) {
         router.push(_perf);
       break;
     case 1:
+      if (_presets)
+        router.push(_presets);
+      break;
+    case 2:
       if (_config)
         router.push(_config);
       break;
-    case 2:
+    case 3:
       if (_sobre)
         router.push(_sobre);
       break;

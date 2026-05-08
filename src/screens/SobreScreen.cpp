@@ -12,13 +12,11 @@
 
 SobreScreen::SobreScreen(Storage *storage, UnifiedControlList *ucl)
     : _storage(storage), _ucl(ucl), _titulo(0, 0, "Sobre", 1),
-      _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1),
       _sobre(0, CONTENT_Y, "Controlador MIDI", 1),
       _versao(0, CONTENT_Y + 10, FIRMWARE_VERSION, 1),
       _infoCanal(0, CONTENT_Y + 24, "Canal: 1", 1),
       _infoControles(0, CONTENT_Y + 34, "Controles: 4", 1) {
   addChild(&_titulo);
-  addChild(&_voltar);
   addChild(&_sobre);
   addChild(&_versao);
   addChild(&_infoCanal);
@@ -51,10 +49,8 @@ void SobreScreen::onMount() {
 }
 
 void SobreScreen::handleInput(NavInput input) {
-  if (input == NavInput::SELECT) {
-    if (_app)
-      _app->getRouter().pop();
-  }
+  // BACK é tratado automaticamente pelo Router (pop)
+  (void)input;
 }
 
 void SobreScreen::render(Adafruit_SSD1306 &display) { renderChildren(display); }

@@ -10,6 +10,8 @@ namespace App {
 class Button;
 }
 
+class Screen;
+
 class OledApp {
 public:
   OledApp() : _midiActivity(112, 0, 6), _display(nullptr) {}
@@ -24,9 +26,20 @@ public:
   void setButtonUp(App::Button *btn);
   void setButtonDown(App::Button *btn);
   void setButtonSelect(App::Button *btn);
+  void setButtonBack(App::Button *btn);
 
   Router &getRouter();
   MidiActivityComponent &getMidiActivity();
+
+  /// Define a tela raiz para timeout de inatividade (volta para ela após N
+  /// segundos)
+  void setIdleScreen(Screen *screen);
+
+  /// Define o timeout de inatividade em segundos (0 = desligado)
+  void setIdleTimeoutSeconds(uint16_t seconds);
+
+  /// Reseta o timer de inatividade (chamado internamente a cada input)
+  void resetIdleTimer();
 
 private:
   Adafruit_SSD1306
@@ -37,7 +50,18 @@ private:
   App::Button *_btnUp = nullptr;
   App::Button *_btnDown = nullptr;
   App::Button *_btnSelect = nullptr;
+  App::Button *_btnBack = nullptr;
 
   uint32_t _lastFrameTime = 0;
   static constexpr uint32_t FRAME_INTERVAL_MS = 33;
+
+  // Timeout de inatividade
+  Screen *_idleScreen = nullptr;
+  uint32_t _lastInputTime = 0;
+  uint16_t _idleTimeoutSeconds = 60; // padrão: 60s
+
+  // Feedback "Salvo!" textual (overlay não-bloqueante)
+  bool _showingSaveOverlay = false;
+  uint32_t _saveOverlayStart = 0;
+  static constexpr uint32_t SAVE_OVERLAY_DURATION_MS = 800;
 };

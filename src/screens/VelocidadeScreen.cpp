@@ -5,10 +5,10 @@
 
 VelocidadeScreen::VelocidadeScreen(Storage *storage)
     : _storage(storage), _titulo(0, 0, "Velocidade", 1),
-      _voltar(OLED_WIDTH - 48, 4, "<Voltar", 1),
-      _valorComp(0, CONTENT_Y, "100", 2) {
+      _hint(0, OLED_HEIGHT - 8, "SEL=Salvar  BACK=Canc", 1),
+      _valorComp(0, CONTENT_Y + 8, "100", 2) {
   addChild(&_titulo);
-  addChild(&_voltar);
+  addChild(&_hint);
   addChild(&_valorComp);
 }
 
@@ -16,9 +16,18 @@ void VelocidadeScreen::setApp(OledApp *app) { _app = app; }
 
 void VelocidadeScreen::onMount() {
   _velocidade = _storage->getVelocidade();
+  _velocidadeOriginal = _velocidade;
   snprintf(_buf, sizeof(_buf), "%d", _velocidade);
   _valorComp.setText(_buf);
   markDirty();
+}
+
+bool VelocidadeScreen::handleBack() {
+  // Restaura valor original e volta
+  _velocidade = _velocidadeOriginal;
+  if (_app)
+    _app->getRouter().pop();
+  return true;
 }
 
 void VelocidadeScreen::handleInput(NavInput input) {

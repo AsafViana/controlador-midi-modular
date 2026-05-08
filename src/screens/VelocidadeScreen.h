@@ -4,7 +4,6 @@
 #include "ui/Screen.h"
 #include "ui/components/TextComponent.h"
 
-
 class OledApp;
 
 /**
@@ -19,6 +18,7 @@ public:
   void setApp(OledApp *app);
 
   void handleInput(NavInput input) override;
+  bool handleBack() override;
   void onMount() override;
   void render(Adafruit_SSD1306 &display) override;
 
@@ -26,8 +26,9 @@ private:
   Storage *_storage;
   OledApp *_app = nullptr;
   TextComponent _titulo;
-  TextComponent _voltar;
+  TextComponent _hint;
   TextComponent _valorComp;
   uint8_t _velocidade = 100;
+  uint8_t _velocidadeOriginal = 100;
   char _buf[4];
 };

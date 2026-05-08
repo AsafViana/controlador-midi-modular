@@ -32,6 +32,7 @@ constexpr uint8_t PIN_I2C_SCL = 4; // fio SCL da tela
 constexpr uint8_t PIN_BTN_UP = 11;
 constexpr uint8_t PIN_BTN_DOWN = 12;
 constexpr uint8_t PIN_BTN_SELECT = 13;
+constexpr uint8_t PIN_BTN_BACK = 14;
 constexpr uint8_t PIN_LED = 0;
 
 // ── MIDI DIN (Serial1) ───────────────────────────────
