@@ -82,6 +82,10 @@ USBMIDI_Interface &MidiEngine::getUsbMidi() { return _midi; }
 
 void MidiEngine::setMidiThru(bool enabled) { _midiThruEnabled = enabled; }
 
+void MidiEngine::setDinInputEnabled(bool enabled) {
+  _dinInputEnabled = enabled;
+}
+
 void MidiEngine::setReceiveChannel(uint8_t canal) {
   _receiveChannel = (canal > 16) ? 0 : canal;
 }
@@ -112,26 +116,28 @@ void MidiEngine::update() {
     }
   }
 
-  // Lê mensagens MIDI recebidas via DIN
-  MIDIReadEvent dinEvent = _midiDIN.read();
-  if (dinEvent != MIDIReadEvent::NO_MESSAGE) {
-    ChannelMessage msg = _midiDIN.getChannelMessage();
-    uint8_t msgCanal = msg.getChannel().getRaw() + 1;
+  // Lê mensagens MIDI recebidas via DIN (somente se habilitado)
+  if (_dinInputEnabled) {
+    MIDIReadEvent dinEvent = _midiDIN.read();
+    if (dinEvent != MIDIReadEvent::NO_MESSAGE) {
+      ChannelMessage msg = _midiDIN.getChannelMessage();
+      uint8_t msgCanal = msg.getChannel().getRaw() + 1;
 
-    if (_receiveChannel == 0 || msgCanal == _receiveChannel) {
-      if (msg.getMessageType() == MIDIMessageType::ControlChange) {
-        uint8_t cc = msg.getData1();
-        uint8_t valor = msg.getData2();
-        if (_ccReceivedCallback) {
-          _ccReceivedCallback(cc, valor, msgCanal);
+      if (_receiveChannel == 0 || msgCanal == _receiveChannel) {
+        if (msg.getMessageType() == MIDIMessageType::ControlChange) {
+          uint8_t cc = msg.getData1();
+          uint8_t valor = msg.getData2();
+          if (_ccReceivedCallback) {
+            _ccReceivedCallback(cc, valor, msgCanal);
+          }
+        }
+
+        // MIDI Thru: DIN → USB
+        if (_midiThruEnabled) {
+          _midi.send(msg);
         }
       }
-
-      // MIDI Thru: DIN → USB
-      if (_midiThruEnabled) {
-        _midi.send(msg);
-      }
     }
-  }
+  } // _dinInputEnabled
 #endif
 }

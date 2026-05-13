@@ -41,6 +41,10 @@ public:
   /// Reseta o timer de inatividade (chamado internamente a cada input)
   void resetIdleTimer();
 
+  /// Notifica atividade externa (controles, potenciômetros, etc.)
+  /// Acorda o display se estiver em screensaver e reseta o timer.
+  void notifyExternalActivity();
+
   /// Define tempos do screensaver em segundos (0 = desligado)
   void setScreensaverTimes(uint16_t dimSeconds, uint16_t offSeconds);
 

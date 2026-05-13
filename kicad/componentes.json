@@ -1,0 +1,534 @@
+{
+    "projeto": "Modulo Principal - Controlador MIDI Modular",
+    "mcu": "ESP32-S3-WROOM-1-N16R8",
+    "revisao": "1.0",
+    "componentes": [
+        {
+            "ref": "U1",
+            "valor": "ESP32-S3-WROOM-1-N16R8",
+            "descricao": "Microcontrolador principal",
+            "simbolo_kicad": "RF_Module:ESP32-S3-WROOM-1",
+            "footprint_kicad": "RF_Module:ESP32-S3-WROOM-1",
+            "pinos_usados": {
+                "3V3": "Alimentacao 3.3V",
+                "GND": "Terra",
+                "EN": "Reset (ativo baixo)",
+                "GPIO0": "Boot (strapping)",
+                "GPIO4": "I2C_SCL",
+                "GPIO5": "I2C_SDA",
+                "GPIO7": "Potenciometro (ADC)",
+                "GPIO9": "MIDI DIN TX (Serial1)",
+                "GPIO10": "MIDI DIN RX (Serial1)",
+                "GPIO11": "Botao UP",
+                "GPIO12": "Botao DOWN",
+                "GPIO13": "Botao SELECT",
+                "GPIO14": "Botao BACK",
+                "GPIO19": "USB_D-",
+                "GPIO20": "USB_D+"
+            },
+            "pinos_proibidos": [
+                "GPIO35",
+                "GPIO36",
+                "GPIO37"
+            ]
+        },
+        {
+            "ref": "U2",
+            "valor": "USBLC6-2SC6",
+            "descricao": "Protecao ESD para linhas USB D+/D-",
+            "simbolo_kicad": "Power_Protection:USBLC6-2SC6",
+            "footprint_kicad": "Package_TO_SOT_SMD:SOT-23-6",
+            "pinos": {
+                "1": "I/O1 (D-)",
+                "2": "GND",
+                "3": "I/O2 (D+)",
+                "4": "I/O2 (D+)",
+                "5": "VBUS",
+                "6": "I/O1 (D-)"
+            }
+        },
+        {
+            "ref": "U3",
+            "valor": "AMS1117-3.3",
+            "descricao": "Regulador LDO 5V para 3.3V (800mA)",
+            "simbolo_kicad": "Regulator_Linear:AMS1117-3.3",
+            "footprint_kicad": "Package_TO_SOT_SMD:SOT-223-3_TabPin2",
+            "pinos": {
+                "VIN": "Entrada 5V (VBUS)",
+                "VOUT": "Saida 3.3V",
+                "GND": "Terra"
+            }
+        },
+        {
+            "ref": "U4",
+            "valor": "6N138",
+            "descricao": "Optoacoplador para MIDI IN (isolamento galvanico)",
+            "simbolo_kicad": "Isolator:6N138",
+            "footprint_kicad": "Package_DIP:DIP-8_W7.62mm",
+            "pinos": {
+                "1": "NC",
+                "2": "Anode (entrada MIDI+)",
+                "3": "Cathode (entrada MIDI-)",
+                "4": "NC",
+                "5": "GND",
+                "6": "VO (saida -> GPIO10)",
+                "7": "VCC (3.3V)",
+                "8": "VE (enable, ligar ao GND ou VCC conforme datasheet)"
+            }
+        },
+        {
+            "ref": "J1",
+            "valor": "USB_C_Receptacle",
+            "descricao": "Conector USB-C femea (device, USB 2.0)",
+            "simbolo_kicad": "Connector:USB_C_Receptacle_USB2.0",
+            "footprint_kicad": "Connector_USB:USB_C_Receptacle_GCT_USB4105",
+            "pinos": {
+                "VBUS": "5V entrada",
+                "D-": "Dados USB negativo -> U2 -> GPIO19",
+                "D+": "Dados USB positivo -> U2 -> GPIO20",
+                "CC1": "Pull-down 5.1k -> GND (R1)",
+                "CC2": "Pull-down 5.1k -> GND (R2)",
+                "GND": "Terra",
+                "SHIELD": "Blindagem -> GND"
+            }
+        },
+        {
+            "ref": "J2",
+            "valor": "Conn_01x04",
+            "descricao": "Header 4 pinos para display OLED I2C",
+            "simbolo_kicad": "Connector_Generic:Conn_01x04",
+            "footprint_kicad": "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical",
+            "pinos": {
+                "1": "VCC (3.3V)",
+                "2": "GND",
+                "3": "SDA (GPIO5)",
+                "4": "SCL (GPIO4)"
+            }
+        },
+        {
+            "ref": "J3",
+            "valor": "Conn_01x04",
+            "descricao": "Conector barramento modular I2C - Modulo 1",
+            "simbolo_kicad": "Connector_Generic:Conn_01x04",
+            "footprint_kicad": "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+            "pinos": {
+                "1": "VCC (3.3V)",
+                "2": "GND",
+                "3": "SDA (GPIO5)",
+                "4": "SCL (GPIO4)"
+            }
+        },
+        {
+            "ref": "J4",
+            "valor": "Conn_01x04",
+            "descricao": "Conector barramento modular I2C - Modulo 2",
+            "simbolo_kicad": "Connector_Generic:Conn_01x04",
+            "footprint_kicad": "Connector_JST:JST_SH_SM04B-SRSS-TB_1x04-1MP_P1.00mm_Horizontal",
+            "pinos": {
+                "1": "VCC (3.3V)",
+                "2": "GND",
+                "3": "SDA (GPIO5)",
+                "4": "SCL (GPIO4)"
+            }
+        },
+        {
+            "ref": "J5",
+            "valor": "DIN-5",
+            "descricao": "Conector DIN 5 pinos - MIDI OUT",
+            "simbolo_kicad": "Connector:DIN-5",
+            "footprint_kicad": "Connector_Audio:DIN-5_AudioJack",
+            "pinos": {
+                "1": "NC",
+                "2": "GND (blindagem)",
+                "3": "NC",
+                "4": "3V3 via R6 (33R) - corrente source",
+                "5": "GPIO9 via R7 (33R) - corrente sink/TX"
+            }
+        },
+        {
+            "ref": "J6",
+            "valor": "DIN-5",
+            "descricao": "Conector DIN 5 pinos - MIDI IN",
+            "simbolo_kicad": "Connector:DIN-5",
+            "footprint_kicad": "Connector_Audio:DIN-5_AudioJack",
+            "pinos": {
+                "1": "NC",
+                "2": "GND (blindagem, NAO conectar ao circuito)",
+                "3": "NC",
+                "4": "Sinal MIDI+ -> R8 (220R) -> U4 Anode",
+                "5": "Sinal MIDI- -> U4 Cathode"
+            }
+        },
+        {
+            "ref": "SW1",
+            "valor": "SW_Push",
+            "descricao": "Botao RESET (EN -> GND)",
+            "simbolo_kicad": "Switch:SW_Push",
+            "footprint_kicad": "Button_Switch_SMD:SW_SPST_TL3342",
+            "conexao": "EN --- SW1 --- GND"
+        },
+        {
+            "ref": "SW2",
+            "valor": "SW_Push",
+            "descricao": "Botao BOOT (GPIO0 -> GND)",
+            "simbolo_kicad": "Switch:SW_Push",
+            "footprint_kicad": "Button_Switch_SMD:SW_SPST_TL3342",
+            "conexao": "GPIO0 --- SW2 --- GND"
+        },
+        {
+            "ref": "SW3",
+            "valor": "SW_Push",
+            "descricao": "Botao UP (GPIO11 -> GND)",
+            "simbolo_kicad": "Switch:SW_Push",
+            "footprint_kicad": "Button_Switch_SMD:SW_SPST_TL3342",
+            "conexao": "GPIO11 --- SW3 --- GND (pull-up interno)"
+        },
+        {
+            "ref": "SW4",
+            "valor": "SW_Push",
+            "descricao": "Botao DOWN (GPIO12 -> GND)",
+            "simbolo_kicad": "Switch:SW_Push",
+            "footprint_kicad": "Button_Switch_SMD:SW_SPST_TL3342",
+            "conexao": "GPIO12 --- SW4 --- GND (pull-up interno)"
+        },
+        {
+            "ref": "SW5",
+            "valor": "SW_Push",
+            "descricao": "Botao SELECT (GPIO13 -> GND)",
+            "simbolo_kicad": "Switch:SW_Push",
+            "footprint_kicad": "Button_Switch_SMD:SW_SPST_TL3342",
+            "conexao": "GPIO13 --- SW5 --- GND (pull-up interno)"
+        },
+        {
+            "ref": "SW6",
+            "valor": "SW_Push",
+            "descricao": "Botao BACK (GPIO14 -> GND)",
+            "simbolo_kicad": "Switch:SW_Push",
+            "footprint_kicad": "Button_Switch_SMD:SW_SPST_TL3342",
+            "conexao": "GPIO14 --- SW6 --- GND (pull-up interno)"
+        },
+        {
+            "ref": "RV1",
+            "valor": "10k",
+            "descricao": "Potenciometro linear 10k",
+            "simbolo_kicad": "Device:R_Potentiometer",
+            "footprint_kicad": "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical",
+            "pinos": {
+                "1": "3V3",
+                "2": "Wiper -> GPIO7 (ADC)",
+                "3": "GND"
+            }
+        },
+        {
+            "ref": "R1",
+            "valor": "5.1k",
+            "descricao": "Pull-down CC1 USB-C",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "J1.CC1 --- R1 --- GND"
+        },
+        {
+            "ref": "R2",
+            "valor": "5.1k",
+            "descricao": "Pull-down CC2 USB-C",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "J1.CC2 --- R2 --- GND"
+        },
+        {
+            "ref": "R3",
+            "valor": "10k",
+            "descricao": "Pull-up GPIO0 (BOOT)",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "3V3 --- R3 --- GPIO0"
+        },
+        {
+            "ref": "R4",
+            "valor": "4.7k",
+            "descricao": "Pull-up I2C SDA",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "3V3 --- R4 --- SDA (GPIO5)"
+        },
+        {
+            "ref": "R5",
+            "valor": "4.7k",
+            "descricao": "Pull-up I2C SCL",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "3V3 --- R5 --- SCL (GPIO4)"
+        },
+        {
+            "ref": "R6",
+            "valor": "33",
+            "descricao": "Resistor serie MIDI OUT (corrente source)",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "3V3 --- R6 --- J5.Pin4"
+        },
+        {
+            "ref": "R7",
+            "valor": "33",
+            "descricao": "Resistor serie MIDI OUT (TX)",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "GPIO9 --- R7 --- J5.Pin5"
+        },
+        {
+            "ref": "R8",
+            "valor": "220",
+            "descricao": "Resistor entrada MIDI IN",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "J6.Pin4 --- R8 --- U4.Anode"
+        },
+        {
+            "ref": "R9",
+            "valor": "10k",
+            "descricao": "Pull-up saida optoacoplador MIDI IN",
+            "simbolo_kicad": "Device:R",
+            "footprint_kicad": "Resistor_SMD:R_0805_2012Metric",
+            "conexao": "3V3 --- R9 --- U4.VO (pin 6) --- GPIO10"
+        },
+        {
+            "ref": "C1",
+            "valor": "10uF",
+            "descricao": "Capacitor entrada regulador",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "VBUS (5V) --- C1 --- GND"
+        },
+        {
+            "ref": "C2",
+            "valor": "10uF",
+            "descricao": "Capacitor saida regulador",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "3V3 --- C2 --- GND"
+        },
+        {
+            "ref": "C3",
+            "valor": "100nF",
+            "descricao": "Capacitor saida regulador (HF bypass)",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "3V3 --- C3 --- GND"
+        },
+        {
+            "ref": "C4",
+            "valor": "100nF",
+            "descricao": "Bypass ESP32-S3 (proximo ao modulo)",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "3V3 --- C4 --- GND"
+        },
+        {
+            "ref": "C5",
+            "valor": "1uF",
+            "descricao": "Bulk ESP32-S3 (proximo ao modulo)",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "3V3 --- C5 --- GND"
+        },
+        {
+            "ref": "C6",
+            "valor": "100nF",
+            "descricao": "Debounce EN (reset)",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "EN --- C6 --- GND"
+        },
+        {
+            "ref": "C7",
+            "valor": "100nF",
+            "descricao": "Filtro potenciometro (wiper)",
+            "simbolo_kicad": "Device:C",
+            "footprint_kicad": "Capacitor_SMD:C_0805_2012Metric",
+            "conexao": "GPIO7 (wiper) --- C7 --- GND"
+        },
+        {
+            "ref": "D1",
+            "valor": "1N4148",
+            "descricao": "Diodo protecao reversa MIDI IN",
+            "simbolo_kicad": "Device:D",
+            "footprint_kicad": "Diode_SMD:D_SOD-123",
+            "conexao": "Catodo no Anode do U4, Anodo no Cathode do U4 (protecao reversa)"
+        }
+    ],
+    "nets": [
+        {
+            "nome": "VBUS_5V",
+            "descricao": "5V da USB",
+            "conexoes": [
+                "J1.VBUS",
+                "U2.VBUS",
+                "C1.+",
+                "U3.VIN"
+            ]
+        },
+        {
+            "nome": "3V3",
+            "descricao": "3.3V regulado",
+            "conexoes": [
+                "U3.VOUT",
+                "C2.+",
+                "C3.+",
+                "C4.+",
+                "C5.+",
+                "U1.3V3",
+                "R3.1",
+                "R4.1",
+                "R5.1",
+                "R6.1",
+                "R9.1",
+                "U4.VCC",
+                "J2.1",
+                "J3.1",
+                "J4.1",
+                "RV1.1"
+            ]
+        },
+        {
+            "nome": "GND",
+            "descricao": "Terra comum",
+            "conexoes": [
+                "J1.GND",
+                "U2.GND",
+                "U3.GND",
+                "C1.-",
+                "C2.-",
+                "C3.-",
+                "C4.-",
+                "C5.-",
+                "C6.-",
+                "C7.-",
+                "U1.GND",
+                "U4.GND",
+                "J2.2",
+                "J3.2",
+                "J4.2",
+                "RV1.3",
+                "SW1-SW6.GND",
+                "R1.2",
+                "R2.2"
+            ]
+        },
+        {
+            "nome": "USB_D-",
+            "descricao": "USB Data Minus",
+            "conexoes": [
+                "J1.D-",
+                "U2.IO1",
+                "U1.GPIO19"
+            ]
+        },
+        {
+            "nome": "USB_D+",
+            "descricao": "USB Data Plus",
+            "conexoes": [
+                "J1.D+",
+                "U2.IO2",
+                "U1.GPIO20"
+            ]
+        },
+        {
+            "nome": "I2C_SDA",
+            "descricao": "I2C Data",
+            "conexoes": [
+                "U1.GPIO5",
+                "R4.2",
+                "J2.3",
+                "J3.3",
+                "J4.3"
+            ]
+        },
+        {
+            "nome": "I2C_SCL",
+            "descricao": "I2C Clock",
+            "conexoes": [
+                "U1.GPIO4",
+                "R5.2",
+                "J2.4",
+                "J3.4",
+                "J4.4"
+            ]
+        },
+        {
+            "nome": "MIDI_TX",
+            "descricao": "MIDI DIN saida (Serial1 TX)",
+            "conexoes": [
+                "U1.GPIO9",
+                "R7.1"
+            ]
+        },
+        {
+            "nome": "MIDI_RX",
+            "descricao": "MIDI DIN entrada (Serial1 RX)",
+            "conexoes": [
+                "U4.VO",
+                "R9.2",
+                "U1.GPIO10"
+            ]
+        },
+        {
+            "nome": "BOOT",
+            "descricao": "Strapping boot mode",
+            "conexoes": [
+                "U1.GPIO0",
+                "R3.2",
+                "SW2.1"
+            ]
+        },
+        {
+            "nome": "RESET",
+            "descricao": "Enable/Reset",
+            "conexoes": [
+                "U1.EN",
+                "C6.1",
+                "SW1.1"
+            ]
+        },
+        {
+            "nome": "BTN_UP",
+            "descricao": "Botao navegacao UP",
+            "conexoes": [
+                "U1.GPIO11",
+                "SW3.1"
+            ]
+        },
+        {
+            "nome": "BTN_DOWN",
+            "descricao": "Botao navegacao DOWN",
+            "conexoes": [
+                "U1.GPIO12",
+                "SW4.1"
+            ]
+        },
+        {
+            "nome": "BTN_SELECT",
+            "descricao": "Botao navegacao SELECT",
+            "conexoes": [
+                "U1.GPIO13",
+                "SW5.1"
+            ]
+        },
+        {
+            "nome": "BTN_BACK",
+            "descricao": "Botao navegacao BACK",
+            "conexoes": [
+                "U1.GPIO14",
+                "SW6.1"
+            ]
+        },
+        {
+            "nome": "POT_WIPER",
+            "descricao": "Sinal analogico potenciometro",
+            "conexoes": [
+                "RV1.2",
+                "C7.1",
+                "U1.GPIO7"
+            ]
+        }
+    ]
+}

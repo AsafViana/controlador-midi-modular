@@ -5,11 +5,21 @@
 /**
  * HardwareMap — Registro centralizado de todos os controles físicos.
  *
+ * Módulo Principal do Controlador MIDI Modular (ESP32-S3-WROOM-1-N16R8)
+ *
+ * Interfaces:
+ *   - USB nativo (GPIO19/20) → MIDI USB + alimentação
+ *   - I2C (GPIO4/5) → Display OLED + barramento modular
+ *   - MIDI DIN (GPIO9/10) → Saída/entrada MIDI física (conector 5 pinos)
+ *   - 4 botões de navegação
+ *   - 1 potenciômetro (ADC)
+ *
+ * Pinos proibidos (PSRAM Octal): IO35, IO36, IO37
+ * Pinos de strapping: GPIO0 (BOOT), EN (RESET)
+ * Pinos reservados USB: GPIO19 (D-), GPIO20 (D+)
+ *
  * CCs padrão são atribuídos automaticamente pelo sistema de auto-assign.
- * A lista CC_AUTO_POOL define a ordem de preferência: CCs comuns de
- * controle contínuo primeiro, depois CCs genéricos. Ao adicionar um
- * novo controle, basta usar ccPadrao = 0 e chamar getAutoCCPadrao(i)
- * para obter um CC único sem conflitos. Ou defina manualmente se preferir.
+ * A lista CC_AUTO_POOL define a ordem de preferência.
  */
 
 enum class TipoControle : uint8_t {
@@ -31,34 +41,21 @@ struct ControleHW {
 
 namespace HardwareMap {
 
-// ── I2C — Display OLED ───────────────────────────────
-constexpr uint8_t PIN_I2C_SDA = 5; // fio SDA da tela
-constexpr uint8_t PIN_I2C_SCL = 4; // fio SCL da tela
+// ── I2C — Display OLED + Barramento Modular ──────────
+constexpr uint8_t PIN_I2C_SDA = 5;
+constexpr uint8_t PIN_I2C_SCL = 4;
 
 // ── Botões de navegação (não são controles MIDI) ─────
 constexpr uint8_t PIN_BTN_UP = 11;
 constexpr uint8_t PIN_BTN_DOWN = 12;
 constexpr uint8_t PIN_BTN_SELECT = 13;
 constexpr uint8_t PIN_BTN_BACK = 14;
-constexpr uint8_t PIN_LED = 0;
 
-// ── LED RGB (catodo comum) ───────────────────────────
-// Defina RGB_LED_ENABLED como true para ativar o LED RGB.
-// Se false, o sistema usa apenas o LED simples (PIN_LED).
-constexpr bool RGB_LED_ENABLED = false;
-constexpr uint8_t PIN_LED_R = 15; // Vermelho (PWM)
-constexpr uint8_t PIN_LED_G = 16; // Verde (PWM)
-constexpr uint8_t PIN_LED_B = 17; // Azul (PWM)
-
-// ── MIDI DIN (Serial1) ───────────────────────────────
+// ── MIDI DIN (Serial1) — Conector 5 pinos ───────────
 constexpr uint8_t PIN_MIDI_TX = 9;  // TX para MIDI DIN OUT
 constexpr uint8_t PIN_MIDI_RX = 10; // RX para MIDI DIN IN
 
 // ── Pool de CCs para auto-atribuição ─────────────────
-// Ordem de preferência: CCs de controle contínuo comuns,
-// depois CCs genéricos (16-19, 20-31, 74-79, 80-83...).
-// Quando ccPadrao == 0, o sistema percorre este pool e
-// atribui o primeiro CC que nenhum outro controle já usa.
 constexpr uint8_t CC_AUTO_POOL[] = {
     1,              // Modulation Wheel
     7,              // Volume
@@ -81,15 +78,8 @@ constexpr uint8_t CC_AUTO_POOL_SIZE =
     sizeof(CC_AUTO_POOL) / sizeof(CC_AUTO_POOL[0]);
 
 // ── Controles MIDI endereçáveis a CC ─────────────────
-// GPIOs 1, 2, 3, 6, 7, 8 estão livres para potenciômetros
 constexpr ControleHW CONTROLES[] = {
     {"Pot Extra", 7, TipoControle::POTENCIOMETRO, 0, false}, // CC auto
-    {"Volume", 1, TipoControle::POTENCIOMETRO, 7, false},    // CC 7 (Volume)
-    {"Pan", 2, TipoControle::POTENCIOMETRO, 10, false},      // CC 10 (Pan)
-    {"Modulacao", 3, TipoControle::POTENCIOMETRO, 1, false}, // CC 1 (Mod)
-    {"Sensor Luz", 6, TipoControle::SENSOR, 74, true},       // CC 74, invertido
-    {"Expressao", 8, TipoControle::POTENCIOMETRO, 11,
-     false}, // CC 11 (Expression)
 };
 
 constexpr uint8_t NUM_CONTROLES = sizeof(CONTROLES) / sizeof(CONTROLES[0]);
@@ -123,27 +113,16 @@ inline bool isBotaoMidi(uint8_t i) {
 
 /**
  * Retorna o CC padrão para o controle i.
- *
- * Se ccPadrao > 0, retorna o valor fixo definido no array.
- * Se ccPadrao == 0, percorre o CC_AUTO_POOL e atribui o primeiro
- * CC que nenhum outro controle (com ccPadrao fixo ou auto-assign
- * anterior) já esteja usando. Isso garante que novos controles
- * sempre recebam um CC único sem precisar escolher manualmente.
  */
 inline uint8_t getCCPadrao(uint8_t i) {
   if (i >= NUM_CONTROLES)
     return 0;
 
-  // CC definido manualmente — retorna direto
   if (CONTROLES[i].ccPadrao != 0)
     return CONTROLES[i].ccPadrao;
 
-  // Auto-assign: coleta CCs já usados por controles anteriores
-  // (tanto fixos quanto auto-assigned com índice menor)
-  // Usa bitmap para CCs 0-127
   bool usado[128] = {};
 
-  // Marca CCs fixos de todos os outros controles
   for (uint8_t j = 0; j < NUM_CONTROLES; j++) {
     if (j == i)
       continue;
@@ -152,10 +131,8 @@ inline uint8_t getCCPadrao(uint8_t i) {
     }
   }
 
-  // Resolve auto-assigns anteriores (índice < i) na mesma ordem
   for (uint8_t j = 0; j < i; j++) {
     if (CONTROLES[j].ccPadrao == 0) {
-      // Repete a lógica para achar qual CC j pegou
       for (uint8_t p = 0; p < CC_AUTO_POOL_SIZE; p++) {
         uint8_t candidato = CC_AUTO_POOL[p];
         if (!usado[candidato]) {
@@ -166,7 +143,6 @@ inline uint8_t getCCPadrao(uint8_t i) {
     }
   }
 
-  // Agora encontra o primeiro CC livre no pool para o controle i
   for (uint8_t p = 0; p < CC_AUTO_POOL_SIZE; p++) {
     uint8_t candidato = CC_AUTO_POOL[p];
     if (!usado[candidato]) {
@@ -174,7 +150,6 @@ inline uint8_t getCCPadrao(uint8_t i) {
     }
   }
 
-  // Fallback: se o pool inteiro estiver ocupado, usa CC 14 (genérico)
   return 14;
 }
 

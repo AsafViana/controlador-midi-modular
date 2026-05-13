@@ -85,6 +85,13 @@ void OledApp::setIdleTimeoutSeconds(uint16_t seconds) {
 
 void OledApp::resetIdleTimer() { _lastInputTime = millis(); }
 
+void OledApp::notifyExternalActivity() {
+  _lastInputTime = millis();
+  if (_displayState != DisplayState::ACTIVE) {
+    wakeDisplay();
+  }
+}
+
 void OledApp::setScreensaverTimes(uint16_t dimSeconds, uint16_t offSeconds) {
   _dimTimeoutSeconds = dimSeconds;
   _offTimeoutSeconds = offSeconds;

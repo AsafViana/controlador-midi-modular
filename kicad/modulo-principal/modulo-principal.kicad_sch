@@ -1,0 +1,1037 @@
+(kicad_sch
+  (version 20230121)
+  (generator "custom_generator")
+  (generator_version "7.0")
+  (uuid "e63e39d7-6ac0-4ffd-8aa3-1841a4541b55")
+  (paper "A3")
+  (title_block
+    (title "Modulo Principal - Controlador MIDI Modular")
+    (date "2025-06-01")
+    (rev "1.0")
+    (comment 1 "ESP32-S3-WROOM-1-N16R8")
+    (comment 2 "USB MIDI + I2C Modular + MIDI DIN")
+  )
+
+  (lib_symbols
+  )
+
+  (text "BLOCO 1: USB-C (Alimentacao + Dados)"
+    (at 25 30 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "d141517d-1273-4b67-a0f9-78cc5046e24d")
+  )
+  (text "J1: USB-C Receptaculo (USB 2.0 Device)"
+    (at 27 37 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "6f05724b-b2e2-49b9-9641-a732e5b4798a")
+  )
+  (text "R1: 5.1k CC1 -> GND (pull-down USB-C)"
+    (at 27 41 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "fae8ef21-f579-4ff3-a171-7b2ee7c8620d")
+  )
+  (text "R2: 5.1k CC2 -> GND (pull-down USB-C)"
+    (at 27 45 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "a535db8a-b388-46e0-9a9b-f0ee2773abf2")
+  )
+  (text "U2: USBLC6-2SC6 (ESD/TVS D+/D-)"
+    (at 27 49 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "44bd1903-a9d0-4820-bc1b-a10864319ab6")
+  )
+  (text "VBUS (5V) -> U3 regulador"
+    (at 27 53 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "63fdb7c3-e56a-496d-99ac-eab884c8be46")
+  )
+  (text "D- -> U2 -> GPIO19 (USB_D-)"
+    (at 27 57 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "cb3f4313-eb73-4b1b-88e7-57b2a9dc59a4")
+  )
+  (text "D+ -> U2 -> GPIO20 (USB_D+)"
+    (at 27 61 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "3becb493-1ec1-4ca8-9ecc-677c3882bf47")
+  )
+  (text "BLOCO 2: Regulador 5V -> 3.3V"
+    (at 25 75 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "e7abd818-e74f-4f50-b378-c432bfdbdd88")
+  )
+  (text "U3: AMS1117-3.3 (LDO 800mA)"
+    (at 27 82 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "8fcb600f-c0a9-421f-802b-d75d8aa5c693")
+  )
+  (text "C1: 10uF ceramico (VIN -> GND)"
+    (at 27 86 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "440bf95f-0139-4fb1-9ac5-ddc614cbc97b")
+  )
+  (text "C2: 10uF ceramico (VOUT -> GND)"
+    (at 27 90 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "76d96896-1bd9-4776-8da4-e79d2ac9f5d5")
+  )
+  (text "C3: 100nF ceramico (VOUT -> GND)"
+    (at 27 94 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "9efdeaa0-f1d5-46c7-913b-7809f5bc9ae6")
+  )
+  (text "IN: VBUS 5V | OUT: 3V3 rail"
+    (at 27 98 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "1279db39-1818-4228-9072-2e1c313d8a1c")
+  )
+  (text "BLOCO 3: ESP32-S3-WROOM-1-N16R8"
+    (at 25 115 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "81eb6df9-acc4-460c-9a69-29b40a3384f9")
+  )
+  (text "U1: ESP32-S3-WROOM-1-N16R8"
+    (at 27 122 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "f3cc033a-1585-4680-8b40-e60cd75f88f2")
+  )
+  (text "C4: 100nF (3V3 -> GND, bypass)"
+    (at 27 126 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "95212188-4e32-43af-945a-efa293a4bcd9")
+  )
+  (text "C5: 1uF (3V3 -> GND, bulk)"
+    (at 27 130 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "4dd0d60e-4321-44aa-87b6-35e9341ed578")
+  )
+  (text "Pinagem:"
+    (at 27 136 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "2d39e2ca-58ca-4d96-be85-a6556e16c031")
+  )
+  (text "  GPIO0  = BOOT (strapping, pull-up 10k)"
+    (at 27 140 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "639f4859-9bb2-4e31-964b-f36be8bf8def")
+  )
+  (text "  EN     = RESET (cap 100nF + botao)"
+    (at 27 144 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "51e0336d-d4db-4556-8df6-989b72b8fca5")
+  )
+  (text "  GPIO4  = I2C_SCL"
+    (at 27 148 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "5cd9cfdf-bf4a-4e4c-8c39-a7d1ca54ac96")
+  )
+  (text "  GPIO5  = I2C_SDA"
+    (at 27 152 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "1943b51e-7066-4d66-bded-467f00593155")
+  )
+  (text "  GPIO7  = POT (ADC)"
+    (at 27 156 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "768eedb1-3137-4390-9767-3c551040a861")
+  )
+  (text "  GPIO9  = MIDI_DIN_TX (Serial1)"
+    (at 27 160 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "82d8aed3-b829-4d6b-8ef8-b24e5d3ac212")
+  )
+  (text "  GPIO10 = MIDI_DIN_RX (Serial1)"
+    (at 27 164 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "abfcfa06-51f1-4633-908a-08f10e6f9537")
+  )
+  (text "  GPIO11 = BTN_UP"
+    (at 27 168 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "a1b1a17a-33a6-4fbe-8c79-c970f4d21800")
+  )
+  (text "  GPIO12 = BTN_DOWN"
+    (at 27 172 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "1abfc161-16e0-4b92-87cd-154c2274376b")
+  )
+  (text "  GPIO13 = BTN_SELECT"
+    (at 27 176 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "8c347398-8193-4314-b34b-59c9a21d8995")
+  )
+  (text "  GPIO14 = BTN_BACK"
+    (at 27 180 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "dd2abb67-a510-46cc-a5f8-f5a058ceb393")
+  )
+  (text "  GPIO19 = USB_D-"
+    (at 27 184 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "a1126c34-779a-4b48-8968-187febf46973")
+  )
+  (text "  GPIO20 = USB_D+"
+    (at 27 188 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "4f205229-df9c-459f-8333-12359453d1cf")
+  )
+  (text "  IO35/36/37 = PROIBIDOS (PSRAM)"
+    (at 27 192 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "31731bab-5f16-45c5-8852-1b1c841eee82")
+  )
+  (text "BLOCO 4: Boot e Reset"
+    (at 25 210 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "5d9090bd-3829-4aa6-944d-513a7c0e5e97")
+  )
+  (text "SW1: RESET (EN -> GND, normalmente aberto)"
+    (at 27 217 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "34da1714-ca5c-4416-9f2f-9d03832338c6")
+  )
+  (text "C6: 100nF (EN -> GND, debounce)"
+    (at 27 221 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "6f628adb-d663-4695-8233-be10de745e5a")
+  )
+  (text "SW2: BOOT (GPIO0 -> GND, normalmente aberto)"
+    (at 27 225 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "50c41704-a129-4c43-9e19-3cda37e4ceb4")
+  )
+  (text "R3: 10k (GPIO0 -> 3V3, pull-up)"
+    (at 27 229 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "7d7920c1-9528-45e7-bb73-f96161cf9f9b")
+  )
+  (text "BLOCO 5: Display OLED I2C"
+    (at 25 245 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "bfcd9010-c877-4e0f-b84a-3420bfd2c87e")
+  )
+  (text "J2: Header 1x4 pinos (VCC GND SDA SCL)"
+    (at 27 252 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "5ba5a376-f42c-4ce2-828b-93143d4cf03c")
+  )
+  (text "R4: 4.7k (SDA -> 3V3, pull-up)"
+    (at 27 256 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "af1fd3c0-fbc5-44cd-9a9a-780b34dbf914")
+  )
+  (text "R5: 4.7k (SCL -> 3V3, pull-up)"
+    (at 27 260 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "874f81dd-6ffe-476d-96b3-5544c5b63bde")
+  )
+  (text "Display SSD1306 128x64, endereco 0x3C"
+    (at 27 264 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "1c3ab933-597e-4559-8595-5e7162cb2b3a")
+  )
+  (text "BLOCO 6: Barramento Modular I2C"
+    (at 25 280 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "5e1a406d-8619-48ce-b909-f727c9f8ad91")
+  )
+  (text "J3: JST-SH 4 pinos (3V3 GND SDA SCL) - Modulo 1"
+    (at 27 287 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "d61e0110-b3ac-4700-9442-dc330639784f")
+  )
+  (text "J4: JST-SH 4 pinos (3V3 GND SDA SCL) - Modulo 2"
+    (at 27 291 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "993267d6-f2f2-4494-9a46-0a4e0811ec07")
+  )
+  (text "Mesmo barramento I2C do display (GPIO4/5)"
+    (at 27 295 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "374567c7-8924-4e21-adda-70c2eb130f11")
+  )
+  (text "Pull-ups compartilhados com R4/R5"
+    (at 27 299 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "879ba8f0-5815-4e4f-b619-de9eefd05446")
+  )
+  (text "BLOCO 7: MIDI DIN"
+    (at 180 30 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "31f0f8ae-0662-498c-897f-05586119e794")
+  )
+  (text "--- MIDI OUT ---"
+    (at 182 37 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "cc61f7d7-bede-49c5-a30d-5aedc6ddb16a")
+  )
+  (text "J5: Conector DIN 5 pinos femea"
+    (at 182 41 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "b35d7aa7-4490-4d06-a318-7b7dbcdce798")
+  )
+  (text "  Pino 2: GND (blindagem)"
+    (at 182 45 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "46c65a61-5cbf-4225-a7a4-764df250d0cf")
+  )
+  (text "  Pino 4: 3V3 -> R6 (33R) -> Pino 4"
+    (at 182 49 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "a2d03853-b28a-4f2d-9550-19147914bd4c")
+  )
+  (text "  Pino 5: GPIO9 -> R7 (33R) -> Pino 5"
+    (at 182 53 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "7a49e1a5-b6fb-479e-86e0-bc3ce843a019")
+  )
+  (text "--- MIDI IN ---"
+    (at 182 60 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "2cf9626b-0300-4f8e-ad5f-fa5a46eb41af")
+  )
+  (text "J6: Conector DIN 5 pinos femea"
+    (at 182 64 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "feb5c088-1be1-4b9c-845d-35430a7184ff")
+  )
+  (text "  Pino 4 -> R8 (220R) -> U4 pin 2 (anode)"
+    (at 182 68 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "254ff5a2-4ca6-48ab-ace4-e7f26673fc6b")
+  )
+  (text "  Pino 5 -> U4 pin 3 (cathode)"
+    (at 182 72 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "d6d35ab5-4386-46e9-8a0b-e96c9460a60c")
+  )
+  (text "  D1: 1N4148 (catodo no anode, protecao reversa)"
+    (at 182 76 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "db9e1075-4be7-4ea6-81ec-76dd6eb8c46e")
+  )
+  (text "U4: 6N138 Optoacoplador"
+    (at 182 82 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "de505ff5-997c-49db-9ea8-1e312ab5a4b5")
+  )
+  (text "  Pin 7 (VCC) -> 3V3"
+    (at 182 86 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "9b53307b-cc42-4690-82ca-b15c9aa4bcf8")
+  )
+  (text "  Pin 5 (GND) -> GND"
+    (at 182 90 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "96865f4d-9864-4017-a75e-7ecf1e0aae1d")
+  )
+  (text "  Pin 6 (VO) -> R9 (10k -> 3V3) -> GPIO10"
+    (at 182 94 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "d06950df-e622-469a-814b-f22d155cf8cd")
+  )
+  (text "BLOCO 8: Botoes de Navegacao"
+    (at 180 110 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "c88521c9-6775-4337-9846-eedb02996aea")
+  )
+  (text "Todos: GPIO -> SW -> GND (pull-up interno)"
+    (at 182 117 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "8f7415d0-0fb6-40fc-bfc7-bdce4046d302")
+  )
+  (text "SW3: GPIO11 (UP)"
+    (at 182 123 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "fafa8979-9b5a-4139-a3a8-e08039cc1250")
+  )
+  (text "SW4: GPIO12 (DOWN)"
+    (at 182 127 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "defbce80-72ea-4513-ae13-50253630ff72")
+  )
+  (text "SW5: GPIO13 (SELECT)"
+    (at 182 131 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "694ab443-36f2-4742-957a-11b76d330baf")
+  )
+  (text "SW6: GPIO14 (BACK)"
+    (at 182 135 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "094abffa-6d1c-4856-8bcf-854b53a6251f")
+  )
+  (text "BLOCO 9: Potenciometro"
+    (at 180 150 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "55a88137-4ffb-49f7-9449-4d4130f7d657")
+  )
+  (text "RV1: 10k linear"
+    (at 182 157 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "0ae4ba05-2250-4499-8f4d-384a2c0fe558")
+  )
+  (text "  Pino 1: 3V3"
+    (at 182 161 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "74a4556e-277d-4824-aab9-3b8e41e02625")
+  )
+  (text "  Pino 2 (wiper): GPIO7 (ADC)"
+    (at 182 165 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "9aeb6afe-a179-4903-ba87-f8b309a8deff")
+  )
+  (text "  Pino 3: GND"
+    (at 182 169 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "e2c72ded-30a1-46bd-bb49-e6b58b537fd4")
+  )
+  (text "C7: 100nF (wiper -> GND, filtro)"
+    (at 182 173 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "35082627-7a18-4277-9a6c-0aeccd4f654e")
+  )
+  (text "BOM - Componentes"
+    (at 180 190 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "5939ec47-8ba8-46e0-9768-db22d23a0c5a")
+  )
+  (text "U1: ESP32-S3-WROOM-1-N16R8"
+    (at 182 197 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "97ed8f21-e6cd-4e2f-92a1-4cac6110be50")
+  )
+  (text "U2: USBLC6-2SC6 (ESD)"
+    (at 182 201 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "0b489945-8e59-4c18-b235-2519154dffc9")
+  )
+  (text "U3: AMS1117-3.3 (LDO)"
+    (at 182 205 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "28f777f2-798a-4000-9398-70f64eb052ef")
+  )
+  (text "U4: 6N138 (Optoacoplador)"
+    (at 182 209 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "87040244-3519-4b4b-b716-3462737135ed")
+  )
+  (text "J1: USB-C Receptaculo"
+    (at 182 213 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "d2e3639f-7363-4d96-88ae-e28d436fbc28")
+  )
+  (text "J2: Header 1x4 (OLED)"
+    (at 182 217 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "ca7ffe8b-5331-4cc6-a3e8-6c5b4d000c7d")
+  )
+  (text "J3,J4: JST-SH 1x4 (I2C modular)"
+    (at 182 221 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "89733784-b980-4028-a4c6-6571829e1556")
+  )
+  (text "J5,J6: DIN-5 femea (MIDI)"
+    (at 182 225 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "21cd0640-41a8-4425-bf60-d9b90cd2531c")
+  )
+  (text "SW1: Reset | SW2: Boot"
+    (at 182 229 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "2ea701b5-ab85-4b65-b246-e41216ebcd13")
+  )
+  (text "SW3-SW6: Navegacao"
+    (at 182 233 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "26894806-b489-4512-a82c-a0c5d076c70c")
+  )
+  (text "RV1: Pot 10k linear"
+    (at 182 237 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "0f8a3669-af3f-47f0-92d0-47b63ecb6345")
+  )
+  (text "R1,R2: 5.1k | R3: 10k | R4,R5: 4.7k"
+    (at 182 241 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "6f4cad31-80c1-46a6-8240-6036eb26aae1")
+  )
+  (text "R6,R7: 33R | R8: 220R | R9: 10k"
+    (at 182 245 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "ae14dea6-a8d7-4cb4-a43d-f64b8ce857cc")
+  )
+  (text "C1,C2: 10uF | C3,C4,C6,C7: 100nF | C5: 1uF"
+    (at 182 249 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "5b599e12-d023-4caf-8735-afa202d75663")
+  )
+  (text "D1: 1N4148"
+    (at 182 253 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+    )
+    (uuid "245eaaf9-63c4-423f-b348-82884fd7f5ce")
+  )
+  (text "Nets Globais"
+    (at 180 270 0)
+    (effects
+      (font
+        (size 2.54 2.54)
+        (bold yes)
+      )
+    )
+    (uuid "bedaccb1-8abd-4663-a432-9268f998228d")
+  )
+  (global_label "3V3"
+    (shape passive)
+    (at 182 278 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "65d72c22-22e8-4df4-8a15-19e042c3e15b")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "GND"
+    (shape passive)
+    (at 182 284 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "1a13cc6d-559f-4055-8c02-78304ca9d02d")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "VBUS_5V"
+    (shape passive)
+    (at 182 290 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "494740fb-38c1-4522-b4b7-83dc267446ee")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "USB_D-"
+    (shape bidirectional)
+    (at 182 296 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "8b15e43d-3c8d-493e-9627-dc9cbfa736a8")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "USB_D+"
+    (shape bidirectional)
+    (at 182 302 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "31ed3823-3255-498d-a084-6285a90fd5dc")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "I2C_SDA"
+    (shape bidirectional)
+    (at 182 308 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "c5516858-87ef-4beb-91eb-dc374e365d4f")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "I2C_SCL"
+    (shape bidirectional)
+    (at 182 314 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "15a2abe9-38ac-4ade-aefd-4d6d8931eec8")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "MIDI_TX"
+    (shape output)
+    (at 182 320 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "8bba5e71-7ffa-4f90-8d6f-0c4b98df3024")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+  (global_label "MIDI_RX"
+    (shape input)
+    (at 182 326 0)
+    (effects
+      (font
+        (size 1.27 1.27)
+      )
+      (justify left)
+    )
+    (uuid "b43775bf-d7eb-4dd5-a447-0eb96c807575")
+    (property "Intersheetrefs" "${INTERSHEET_REFS}"
+      (at 0 0 0)
+      (effects
+        (font
+          (size 1.27 1.27)
+        )
+        (hide yes)
+      )
+    )
+  )
+)

@@ -35,6 +35,18 @@ void ControlReader::begin() {
       pinMode(HardwareMap::getGpio(i), INPUT_PULLUP);
     }
   }
+
+  // Estabilização: faz leituras iniciais para preencher o filtro EMA
+  // sem enviar CC, evitando mensagens espúrias no boot.
+  delay(50);
+  for (uint8_t i = 0; i < HardwareMap::NUM_CONTROLES; i++) {
+    if (HardwareMap::isAnalogico(i)) {
+      // Preenche o filtro EMA com a leitura atual
+      uint8_t valor = lerControle(i);
+      _ultimoValor[i] =
+          valor; // Marca como "já enviado" para suprimir o primeiro envio
+    }
+  }
 #endif
 }
 

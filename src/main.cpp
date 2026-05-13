@@ -88,6 +88,9 @@ void onMidiCCReceived(uint8_t cc, uint8_t valor, uint8_t canal) {
 }
 
 void onCCActivity(const CCActivityInfo &info) {
+  if (app)
+    app->notifyExternalActivity();
+
   if (perfScreen)
     perfScreen->atualizarCCInfo(info);
 

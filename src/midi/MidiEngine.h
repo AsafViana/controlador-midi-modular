@@ -42,6 +42,10 @@ public:
   /// Habilita/desabilita MIDI Thru (reenvio entre interfaces)
   void setMidiThru(bool enabled);
 
+  /// Habilita/desabilita leitura da interface DIN (Serial1 RX).
+  /// Desabilitado por padrão para evitar lixo quando o pino RX está flutuante.
+  void setDinInputEnabled(bool enabled);
+
   /// Define filtro de canal para MIDI IN (0 = aceitar todos)
   void setReceiveChannel(uint8_t canal);
 
@@ -53,7 +57,9 @@ private:
   MidiActivityCallback _activityCallback = nullptr;
   MidiCCReceivedCallback _ccReceivedCallback = nullptr;
   SysExReceivedCallback _sysExReceivedCallback = nullptr;
-  bool _midiThruEnabled = true;
+  bool _midiThruEnabled = false;
+  bool _dinInputEnabled =
+      false; // DIN RX desabilitado por padrão (pino flutuante = lixo)
   uint8_t _receiveChannel = 0; // 0 = todos
 
   /// Notifica o callback de atividade (se registrado).

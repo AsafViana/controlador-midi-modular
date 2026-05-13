@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="1600" height="1100" font-family="monospace">
+<style>
+  .title { font-size: 14px; font-weight: bold; fill: #333; }
+  .subtitle { font-size: 11px; fill: #555; }
+  .comp { font-size: 10px; fill: #000; }
+  .pin { font-size: 9px; fill: #0066cc; }
+  .net { font-size: 9px; fill: #cc0000; font-weight: bold; }
+  .note { font-size: 8px; fill: #666; font-style: italic; }
+  .wire { stroke: #006600; stroke-width: 1.5; fill: none; }
+  .bus { stroke: #006600; stroke-width: 3; fill: none; }
+  .box { stroke: #333; stroke-width: 1.5; fill: #f9f9f9; rx: 5; }
+  .ic-box { stroke: #000; stroke-width: 2; fill: #ffffee; }
+  .conn-box { stroke: #000; stroke-width: 1.5; fill: #eeffee; }
+  .pwr-box { stroke: #cc0000; stroke-width: 1.5; fill: #fff0f0; }
+  .dot { fill: #006600; }
+</style>
+<rect width="1600" height="1100" fill="white"/>
+<rect x="10" y="10" width="1580" height="50" fill="#f0f0f0" stroke="#333" stroke-width="1"/>
+<text x="20" y="35" class="title" style="font-size:16px">MODULO PRINCIPAL - CONTROLADOR MIDI MODULAR</text>
+<text x="20" y="50" class="subtitle">ESP32-S3-WROOM-1-N16R8 | Rev 1.0 | USB MIDI + I2C Modular + MIDI DIN</text>
+<text x="1200" y="35" class="subtitle">Alimentacao: USB-C 5V -> LDO 3.3V</text>
+<text x="1200" y="50" class="subtitle">Comunicacao modular: I2C (GPIO4/5)</text>
+<rect x="20" y="70" width="300" height="200" class="box"/>
+<text x="25" y="84" class="title">BLOCO 1: USB-C + Protecao</text>
+<rect x="40" y="95" width="120" height="118" class="conn-box"/>
+<text x="100" y="109" text-anchor="middle" class="comp" style="font-weight:bold">J1: USB-C</text>
+<text x="45" y="125" class="pin">VBUS (5V)</text>
+<text x="45" y="139" class="pin">D- (dados)</text>
+<text x="45" y="153" class="pin">D+ (dados)</text>
+<text x="45" y="167" class="pin">CC1</text>
+<text x="45" y="181" class="pin">CC2</text>
+<text x="45" y="195" class="pin">GND</text>
+<text x="45" y="209" class="pin">SHIELD</text>
+<rect x="180" y="150" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="200" y="148" text-anchor="middle" class="comp">R1 5.1k</text>
+<text x="180" y="175" class="note">CC1 -> GND</text>
+<rect x="180" y="185" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="200" y="183" text-anchor="middle" class="comp">R2 5.1k</text>
+<text x="180" y="210" class="note">CC2 -> GND</text>
+<rect x="180" y="220" width="110" height="40" class="ic-box"/>
+<text x="235" y="234" text-anchor="middle" class="comp" style="font-weight:bold">U2</text>
+<text x="235" y="246" text-anchor="middle" class="comp">USBLC6-2SC6</text>
+<text x="185" y="250" class="note">ESD D+/D- (baixa cap.)</text>
+<rect x="20" y="280" width="300" height="150" class="pwr-box"/>
+<text x="25" y="294" class="title">BLOCO 2: Regulador 5V -> 3.3V</text>
+<rect x="50" y="320" width="130" height="60" class="ic-box"/>
+<text x="115" y="334" text-anchor="middle" class="comp" style="font-weight:bold">U3</text>
+<text x="115" y="346" text-anchor="middle" class="comp">AMS1117-3.3</text>
+<text x="54" y="360" class="pin">VIN (5V)</text>
+<line x1="40" y1="357" x2="50" y2="357" class="wire"/>
+<text x="54" y="376" class="pin">GND</text>
+<line x1="40" y1="373" x2="50" y2="373" class="wire"/>
+<text x="176" y="360" text-anchor="end" class="pin">VOUT (3V3)</text>
+<line x1="180" y1="357" x2="190" y2="357" class="wire"/>
+<rect x="200" y="310" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="220" y="308" text-anchor="middle" class="comp">C1 10uF</text>
+<text x="200" y="305" class="note">Entrada</text>
+<rect x="200" y="340" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="220" y="338" text-anchor="middle" class="comp">C2 10uF</text>
+<text x="200" y="335" class="note">Saida</text>
+<rect x="200" y="370" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="220" y="368" text-anchor="middle" class="comp">C3 100nF</text>
+<text x="200" y="365" class="note">Saida HF</text>
+<text x="50" y="315" class="net">VBUS_5V</text>
+<text x="200" y="400" class="net">3V3</text>
+<rect x="340" y="70" width="380" height="500" class="box"/>
+<text x="345" y="84" class="title">BLOCO 3: ESP32-S3-WROOM-1-N16R8</text>
+<rect x="370" y="100" width="320" height="440" class="ic-box"/>
+<text x="530" y="114" text-anchor="middle" class="comp" style="font-weight:bold">U1</text>
+<text x="530" y="126" text-anchor="middle" class="comp">ESP32-S3-WROOM-1-N16R8</text>
+<text x="374" y="140" class="pin">3V3 (VDD)</text>
+<line x1="360" y1="137" x2="370" y2="137" class="wire"/>
+<text x="374" y="156" class="pin">EN (RESET)</text>
+<line x1="360" y1="153" x2="370" y2="153" class="wire"/>
+<text x="374" y="172" class="pin">GPIO0 (BOOT)</text>
+<line x1="360" y1="169" x2="370" y2="169" class="wire"/>
+<text x="374" y="188" class="pin">GPIO4 (I2C_SCL)</text>
+<line x1="360" y1="185" x2="370" y2="185" class="wire"/>
+<text x="374" y="204" class="pin">GPIO5 (I2C_SDA)</text>
+<line x1="360" y1="201" x2="370" y2="201" class="wire"/>
+<text x="374" y="220" class="pin">GPIO7 (POT/ADC)</text>
+<line x1="360" y1="217" x2="370" y2="217" class="wire"/>
+<text x="374" y="236" class="pin">GPIO9 (MIDI_TX)</text>
+<line x1="360" y1="233" x2="370" y2="233" class="wire"/>
+<text x="374" y="252" class="pin">GPIO10 (MIDI_RX)</text>
+<line x1="360" y1="249" x2="370" y2="249" class="wire"/>
+<text x="374" y="268" class="pin">GPIO11 (BTN_UP)</text>
+<line x1="360" y1="265" x2="370" y2="265" class="wire"/>
+<text x="374" y="284" class="pin">GPIO12 (BTN_DOWN)</text>
+<line x1="360" y1="281" x2="370" y2="281" class="wire"/>
+<text x="374" y="300" class="pin">GPIO13 (BTN_SEL)</text>
+<line x1="360" y1="297" x2="370" y2="297" class="wire"/>
+<text x="374" y="316" class="pin">GPIO14 (BTN_BACK)</text>
+<line x1="360" y1="313" x2="370" y2="313" class="wire"/>
+<text x="374" y="332" class="pin">GND</text>
+<line x1="360" y1="329" x2="370" y2="329" class="wire"/>
+<text x="686" y="140" text-anchor="end" class="pin">GPIO19 (USB_D-)</text>
+<line x1="690" y1="137" x2="700" y2="137" class="wire"/>
+<text x="686" y="156" text-anchor="end" class="pin">GPIO20 (USB_D+)</text>
+<line x1="690" y1="153" x2="700" y2="153" class="wire"/>
+<text x="686" y="172" text-anchor="end" class="pin">GPIO35 [PSRAM]</text>
+<line x1="690" y1="169" x2="700" y2="169" class="wire"/>
+<text x="686" y="188" text-anchor="end" class="pin">GPIO36 [PSRAM]</text>
+<line x1="690" y1="185" x2="700" y2="185" class="wire"/>
+<text x="686" y="204" text-anchor="end" class="pin">GPIO37 [PSRAM]</text>
+<line x1="690" y1="201" x2="700" y2="201" class="wire"/>
+<text x="686" y="220" text-anchor="end" class="pin">GPIO43 (livre)</text>
+<line x1="690" y1="217" x2="700" y2="217" class="wire"/>
+<text x="686" y="236" text-anchor="end" class="pin">GPIO44 (livre)</text>
+<line x1="690" y1="233" x2="700" y2="233" class="wire"/>
+<text x="686" y="252" text-anchor="end" class="pin">GPIO48 (livre)</text>
+<line x1="690" y1="249" x2="700" y2="249" class="wire"/>
+<text x="686" y="268" text-anchor="end" class="pin">EPAD -> GND</text>
+<line x1="690" y1="265" x2="700" y2="265" class="wire"/>
+<rect x="380" y="545" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="400" y="543" text-anchor="middle" class="comp">C4 100nF</text>
+<rect x="440" y="545" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="460" y="543" text-anchor="middle" class="comp">C5 1uF</text>
+<text x="380" y="540" class="note">Bypass 3V3</text>
+<rect x="340" y="580" width="380" height="100" class="box"/>
+<text x="345" y="594" class="title">BLOCO 4: Boot e Reset</text>
+<text x="360" y="610" class="comp">SW1: RESET -> EN -> GND (N.O.)</text>
+<text x="360" y="625" class="comp">C6: 100nF (EN -> GND debounce)</text>
+<text x="360" y="645" class="comp">SW2: BOOT -> GPIO0 -> GND (N.O.)</text>
+<text x="360" y="660" class="comp">R3: 10k pull-up (GPIO0 -> 3V3)</text>
+<rect x="740" y="70" width="250" height="130" class="box"/>
+<text x="745" y="84" class="title">BLOCO 5: Display OLED I2C</text>
+<rect x="760" y="95" width="140" height="76" class="conn-box"/>
+<text x="830" y="109" text-anchor="middle" class="comp" style="font-weight:bold">J2: Header 1x4</text>
+<text x="765" y="125" class="pin">1: VCC (3V3)</text>
+<text x="765" y="139" class="pin">2: GND</text>
+<text x="765" y="153" class="pin">3: SDA (GPIO5)</text>
+<text x="765" y="167" class="pin">4: SCL (GPIO4)</text>
+<rect x="920" y="110" width="12" height="40" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="938" y="130" class="comp">R4 4.7k</text>
+<text x="940" y="125" class="note">SDA pull-up</text>
+<rect x="920" y="155" width="12" height="40" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="938" y="175" class="comp">R5 4.7k</text>
+<text x="940" y="170" class="note">SCL pull-up</text>
+<text x="760" y="195" class="note">SSD1306 128x64, addr 0x3C</text>
+<rect x="740" y="210" width="250" height="110" class="box"/>
+<text x="745" y="224" class="title">BLOCO 6: Barramento Modular I2C</text>
+<rect x="760" y="235" width="100" height="76" class="conn-box"/>
+<text x="810" y="249" text-anchor="middle" class="comp" style="font-weight:bold">J3: JST-SH 4p</text>
+<text x="765" y="265" class="pin">1: 3V3</text>
+<text x="765" y="279" class="pin">2: GND</text>
+<text x="765" y="293" class="pin">3: SDA</text>
+<text x="765" y="307" class="pin">4: SCL</text>
+<rect x="875" y="235" width="100" height="76" class="conn-box"/>
+<text x="925" y="249" text-anchor="middle" class="comp" style="font-weight:bold">J4: JST-SH 4p</text>
+<text x="880" y="265" class="pin">1: 3V3</text>
+<text x="880" y="279" class="pin">2: GND</text>
+<text x="880" y="293" class="pin">3: SDA</text>
+<text x="880" y="307" class="pin">4: SCL</text>
+<text x="760" y="315" class="note">Mesmo bus I2C do display (GPIO4/5)</text>
+<rect x="740" y="330" width="400" height="250" class="box"/>
+<text x="745" y="344" class="title">BLOCO 7: MIDI DIN (5 pinos)</text>
+<text x="760" y="360" class="subtitle">--- MIDI OUT ---</text>
+<rect x="760" y="370" width="120" height="62" class="conn-box"/>
+<text x="820" y="384" text-anchor="middle" class="comp" style="font-weight:bold">J5: DIN-5 OUT</text>
+<text x="765" y="400" class="pin">Pin 2: GND</text>
+<text x="765" y="414" class="pin">Pin 4: corrente (+)</text>
+<text x="765" y="428" class="pin">Pin 5: corrente (-)</text>
+<text x="900" y="390" class="comp">3V3 -> R6 (33R) -> Pin 4</text>
+<text x="900" y="405" class="comp">GPIO9 -> R7 (33R) -> Pin 5</text>
+<rect x="900" y="410" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="920" y="408" text-anchor="middle" class="comp">R6 33R</text>
+<rect x="900" y="435" width="40" height="12" fill="#ffe0b0" stroke="#333" stroke-width="1"/>
+<text x="920" y="433" text-anchor="middle" class="comp">R7 33R</text>
+<text x="760" y="470" class="subtitle">--- MIDI IN ---</text>
+<rect x="760" y="480" width="120" height="48" class="conn-box"/>
+<text x="820" y="494" text-anchor="middle" class="comp" style="font-weight:bold">J6: DIN-5 IN</text>
+<text x="765" y="510" class="pin">Pin 4: sinal (+)</text>
+<text x="765" y="524" class="pin">Pin 5: sinal (-)</text>
+<rect x="900" y="475" width="120" height="80" class="ic-box"/>
+<text x="960" y="489" text-anchor="middle" class="comp" style="font-weight:bold">U4</text>
+<text x="960" y="501" text-anchor="middle" class="comp">6N138</text>
+<text x="904" y="515" class="pin">Anode (2)</text>
+<line x1="890" y1="512" x2="900" y2="512" class="wire"/>
+<text x="904" y="531" class="pin">Cathode (3)</text>
+<line x1="890" y1="528" x2="900" y2="528" class="wire"/>
+<text x="1016" y="515" text-anchor="end" class="pin">VCC (7)</text>
+<line x1="1020" y1="512" x2="1030" y2="512" class="wire"/>
+<text x="1016" y="531" text-anchor="end" class="pin">VO (6)</text>
+<line x1="1020" y1="528" x2="1030" y2="528" class="wire"/>
+<text x="1016" y="547" text-anchor="end" class="pin">GND (5)</text>
+<line x1="1020" y1="544" x2="1030" y2="544" class="wire"/>
+<text x="900" y="560" class="comp">R8: 220R (entrada)</text>
+<text x="900" y="573" class="comp">R9: 10k (pull-up VO -> 3V3)</text>
+<text x="760" y="573" class="comp">D1: 1N4148 (protecao reversa)</text>
+<text x="1030" y="510" class="net">-> GPIO10</text>
+<rect x="1010" y="70" width="220" height="130" class="box"/>
+<text x="1015" y="84" class="title">BLOCO 8: Botoes Navegacao</text>
+<text x="1030" y="100" class="comp">SW3: GPIO11 -> GND  [UP]</text>
+<text x="1030" y="118" class="comp">SW4: GPIO12 -> GND  [DOWN]</text>
+<text x="1030" y="136" class="comp">SW5: GPIO13 -> GND  [SELECT]</text>
+<text x="1030" y="154" class="comp">SW6: GPIO14 -> GND  [BACK]</text>
+<text x="1030" y="175" class="note">Pull-up interno (INPUT_PULLUP)</text>
+<text x="1030" y="188" class="note">Debounce em software</text>
+<rect x="1010" y="210" width="220" height="100" class="box"/>
+<text x="1015" y="224" class="title">BLOCO 9: Potenciometro</text>
+<text x="1030" y="240" class="comp">RV1: 10k linear</text>
+<text x="1030" y="258" class="comp">  Pino 1: 3V3</text>
+<text x="1030" y="274" class="comp">  Pino 2 (wiper): GPIO7</text>
+<text x="1030" y="290" class="comp">  Pino 3: GND</text>
+<text x="1030" y="305" class="note">C7: 100nF (wiper -> GND)</text>
+<line x1="160" y1="115" x2="360" y2="115" class="wire"/>
+<text x="250" y="112" class="net">VBUS_5V</text>
+<line x1="160" y1="129" x2="360" y2="165" class="wire"/>
+<text x="250" y="140" class="net">USB_D-</text>
+<line x1="160" y1="143" x2="360" y2="181" class="wire"/>
+<text x="250" y="155" class="net">USB_D+</text>
+<line x1="320" y1="355" x2="360" y2="137" class="wire"/>
+<text x="325" y="350" class="net">3V3</text>
+<line x1="690" y1="197" x2="760" y2="165" class="wire"/>
+<text x="700" y="190" class="net">I2C_SDA</text>
+<line x1="690" y1="213" x2="760" y2="179" class="wire"/>
+<text x="700" y="208" class="net">I2C_SCL</text>
+<line x1="690" y1="245" x2="900" y2="395" class="wire"/>
+<text x="750" y="350" class="net">MIDI_TX (GPIO9)</text>
+<line x1="690" y1="277" x2="1010" y2="100" class="wire"/>
+<line x1="690" y1="293" x2="1010" y2="118" class="wire"/>
+<line x1="690" y1="309" x2="1010" y2="136" class="wire"/>
+<line x1="690" y1="325" x2="1010" y2="154" class="wire"/>
+<rect x="1250" y="70" width="330" height="250" class="box"/>
+<text x="1255" y="84" class="title">LEGENDA / NOTAS</text>
+<text x="1270" y="100" class="comp">Alimentacao: USB-C 5V -> AMS1117 -> 3.3V</text>
+<text x="1270" y="118" class="comp">USB: Nativo GPIO19/20 (MIDI USB)</text>
+<text x="1270" y="136" class="comp">I2C: GPIO4 (SCL) + GPIO5 (SDA)</text>
+<text x="1270" y="154" class="comp">  -> OLED + Modulos perifericos</text>
+<text x="1270" y="172" class="comp">MIDI DIN: GPIO9 (TX) + GPIO10 (RX)</text>
+<text x="1270" y="190" class="comp">Botoes: GPIO11-14 (pull-up interno)</text>
+<text x="1270" y="208" class="comp">Pot: GPIO7 (ADC)</text>
+<text x="1270" y="230" class="net">PROIBIDOS: IO35, IO36, IO37 (PSRAM)</text>
+<text x="1270" y="248" class="comp">BOOT: GPIO0 | RESET: EN</text>
+<text x="1270" y="270" class="comp">Conector modular: JST-SH 4p</text>
+<text x="1270" y="288" class="comp">  (3V3, GND, SDA, SCL)</text>
+<text x="1270" y="310" class="note">Todos capacitores: ceramico SMD 0805</text>
+<rect x="1250" y="330" width="330" height="100" class="box"/>
+<text x="1255" y="344" class="title">GPIOs LIVRES (expansao futura)</text>
+<text x="1270" y="360" class="comp">1, 2, 3, 6, 8, 15, 16, 17, 18, 21</text>
+<text x="1270" y="378" class="comp">38, 39, 40, 41, 42, 43, 44, 47, 48</text>
+<text x="1270" y="400" class="note">Total: 19 GPIOs disponiveis</text>
+<text x="1270" y="418" class="note">ADC disponiveis: 1, 2, 3, 6, 8, 15, 16, 17, 18</text>
+</svg>
