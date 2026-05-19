@@ -1,4 +1,5 @@
 #include "MidiEngine.h"
+#include "ble/CCStateStore.h"
 #ifdef ARDUINO
 #include "hardware/HardwareMap.h"
 #endif
@@ -90,6 +91,8 @@ void MidiEngine::setReceiveChannel(uint8_t canal) {
   _receiveChannel = (canal > 16) ? 0 : canal;
 }
 
+void MidiEngine::setCCStateStore(CCStateStore *store) { _ccStateStore = store; }
+
 void MidiEngine::update() {
 #ifdef ARDUINO
   // Lê mensagens MIDI recebidas via USB
@@ -104,6 +107,9 @@ void MidiEngine::update() {
       if (msg.getMessageType() == MIDIMessageType::ControlChange) {
         uint8_t cc = msg.getData1();
         uint8_t valor = msg.getData2();
+        if (_ccStateStore) {
+          _ccStateStore->set(msgCanal, cc, valor);
+        }
         if (_ccReceivedCallback) {
           _ccReceivedCallback(cc, valor, msgCanal);
         }
@@ -127,6 +133,9 @@ void MidiEngine::update() {
         if (msg.getMessageType() == MIDIMessageType::ControlChange) {
           uint8_t cc = msg.getData1();
           uint8_t valor = msg.getData2();
+          if (_ccStateStore) {
+            _ccStateStore->set(msgCanal, cc, valor);
+          }
           if (_ccReceivedCallback) {
             _ccReceivedCallback(cc, valor, msgCanal);
           }

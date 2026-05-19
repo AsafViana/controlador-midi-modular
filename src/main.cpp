@@ -1,3 +1,5 @@
+#include "ble/BleServer.h"
+#include "ble/CCStateStore.h"
 #include "button/Button.h"
 #include "config.h"
 #include "hardware/ControlReader.h"
@@ -62,6 +64,9 @@ static BackupScreen *backupScreen = nullptr;
 static WizardScreen *wizardScreen = nullptr;
 static MidiClock *midiClock = nullptr;
 
+static CCStateStore *ccStateStore = nullptr;
+static BleServer *bleServer = nullptr;
+
 static bool headlessMode = false;
 static uint32_t headlessLedTimer = 0;
 static StatusLed *statusLed = nullptr;
@@ -119,6 +124,35 @@ void onCCActivity(const CCActivityInfo &info) {
   }
 }
 
+/// Callback registrado no CCStateStore::onChange — encaminha toda mudança de CC
+/// para o BleServer como notificação BLE (non-blocking).
+/// Chamado após cada set() bem-sucedido (local, MIDI IN ou BLE write).
+void onCCStateChanged(uint8_t channel, uint8_t controller, uint8_t value) {
+  if (bleServer) {
+    bleServer->notifyCC(channel, controller, value);
+  }
+}
+
+void onBleConnectionChange(bool connected, const char *address) {
+  if (connected) {
+    Serial.printf("[BLE] Cliente conectado: %s\n", address);
+  } else {
+    Serial.println("[BLE] Cliente desconectado");
+  }
+  // Atualiza StatusLed — usa ESPECIAL (roxo) para BLE conectado
+  if (statusLed) {
+    if (connected) {
+      statusLed->setEstado(StatusLed::Estado::ESPECIAL);
+    } else {
+      statusLed->setEstado(StatusLed::Estado::OK);
+    }
+  }
+  // Notifica display se disponível
+  if (app) {
+    app->notifyExternalActivity();
+  }
+}
+
 void setup() {
   // [1] USB MIDI — DEVE ser o primeiro, antes de Serial.begin()
   engine = new MidiEngine();
@@ -154,6 +188,28 @@ void setup() {
   Serial.println("[6] LED");
   statusLed = new StatusLed();
   statusLed->begin();
+
+  // [6.5] BLE — CCStateStore + BleServer
+  Serial.println("[6.5] BLE");
+  ccStateStore = new CCStateStore();
+  ccStateStore->begin();
+
+  // Wire CCStateStore into existing modules so local/MIDI-IN changes update the
+  // store
+  controlReader->setCCStateStore(ccStateStore);
+  engine->setCCStateStore(ccStateStore);
+
+  bleServer = new BleServer();
+  bleServer->setCCStateStore(ccStateStore);
+  bleServer->setMidiEngine(engine);
+  bleServer->onConnectionChange(onBleConnectionChange);
+
+  if (!bleServer->begin()) {
+    Serial.println("AVISO: BLE falhou — operacao MIDI continua sem BLE");
+  }
+
+  // Registra callback: toda mudança no CCStateStore gera notificação BLE
+  ccStateStore->onChange(onCCStateChanged);
 
   Serial.println("[7] app/display");
   app = new OledApp();

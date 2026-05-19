@@ -8,6 +8,7 @@
 class MidiEngine;
 class Storage;
 class I2CScanner;
+class CCStateStore;
 
 /**
  * ControlReader — Leitura automática de controles analógicos.
@@ -77,11 +78,15 @@ public:
   /// Registra callback chamado a cada envio de CC com dados completos.
   void onCCActivity(CCActivityCallback callback);
 
+  /// Define o CCStateStore para atualização local de valores CC.
+  void setCCStateStore(CCStateStore *store);
+
 private:
   MidiEngine *_engine;
   Storage *_storage;
   UnifiedControlList *_ucl;
   I2CScanner *_scanner;
+  CCStateStore *_ccStateStore = nullptr;
 
   uint8_t _ultimoValor[HardwareMap::NUM_CONTROLES];
   uint8_t _ultimoValorRemoto[MAX_REMOTE_CONTROLS];

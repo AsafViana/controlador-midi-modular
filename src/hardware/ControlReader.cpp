@@ -1,4 +1,5 @@
 #include "hardware/ControlReader.h"
+#include "ble/CCStateStore.h"
 #include "hardware/ResponseCurve.h"
 #include "i2c/I2CScanner.h"
 #include "midi/MidiCC.h"
@@ -52,6 +53,10 @@ void ControlReader::begin() {
 
 void ControlReader::onCCActivity(CCActivityCallback callback) {
   _ccActivityCallback = callback;
+}
+
+void ControlReader::setCCStateStore(CCStateStore *store) {
+  _ccStateStore = store;
 }
 
 uint8_t ControlReader::lerControle(uint8_t indice) {
@@ -125,6 +130,9 @@ void ControlReader::update() {
 
     uint8_t cc = _storage->getControladorCC(i);
     MidiCC msg(cc, valor, canal);
+    if (_ccStateStore) {
+      _ccStateStore->set(canal, cc, valor);
+    }
     _engine->sendCC(msg);
 
     _ultimoValor[i] = valor;
@@ -196,6 +204,9 @@ void ControlReader::update() {
 
         uint8_t cc = _storage->getRemoteCC(addr, ctrlIdx);
         MidiCC msg(cc, valor, canal);
+        if (_ccStateStore) {
+          _ccStateStore->set(canal, cc, valor);
+        }
         _engine->sendCC(msg);
 
         _ultimoValorRemoto[remoteIdx] = valor;
@@ -243,6 +254,9 @@ void ControlReader::processarBotoesMidi(uint8_t canal) {
         // Momentâneo: press=127, release=0
         valor = pressed ? 127 : 0;
         MidiCC msg(cc, valor, canal);
+        if (_ccStateStore) {
+          _ccStateStore->set(canal, cc, valor);
+        }
         _engine->sendCC(msg);
       } else if (tipo == TipoControle::BOTAO_MIDI_TOGGLE) {
         // Toggle: alterna a cada press (ignora release)
@@ -250,6 +264,9 @@ void ControlReader::processarBotoesMidi(uint8_t canal) {
           _btnMidiState[i].toggleValue = !_btnMidiState[i].toggleValue;
           valor = _btnMidiState[i].toggleValue ? 127 : 0;
           MidiCC msg(cc, valor, canal);
+          if (_ccStateStore) {
+            _ccStateStore->set(canal, cc, valor);
+          }
           _engine->sendCC(msg);
         } else {
           continue; // Release não envia nada no toggle

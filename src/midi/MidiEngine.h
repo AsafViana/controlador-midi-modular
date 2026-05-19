@@ -3,6 +3,8 @@
 #include "MidiNote.h"
 #include <Control_Surface.h>
 
+class CCStateStore;
+
 /// Tipo do callback chamado a cada envio MIDI.
 using MidiActivityCallback = void (*)();
 
@@ -49,6 +51,10 @@ public:
   /// Define filtro de canal para MIDI IN (0 = aceitar todos)
   void setReceiveChannel(uint8_t canal);
 
+  /// Define o CCStateStore para atualização automática ao receber CC via MIDI
+  /// IN.
+  void setCCStateStore(CCStateStore *store);
+
 private:
   USBMIDI_Interface _midi;
 #ifdef ARDUINO
@@ -61,6 +67,7 @@ private:
   bool _dinInputEnabled =
       false; // DIN RX desabilitado por padrão (pino flutuante = lixo)
   uint8_t _receiveChannel = 0; // 0 = todos
+  CCStateStore *_ccStateStore = nullptr;
 
   /// Notifica o callback de atividade (se registrado).
   void notifyActivity();
